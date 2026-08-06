@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A lightweight feedback board for the Debug Tool engineering team."
+    />
+    <meta name="theme-color" content="#090b0d" />
+    <title>Debug tool feedbacks</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Debug tool feedbacks home">Debug tool feedbacks</a>
+
+      <div class="header-actions">
+        <div class="language-switcher" role="group" aria-label="Language">
+          <button class="language-button is-active" type="button" data-language="en">EN</button>
+          <button class="language-button" type="button" data-language="zh">中文</button>
+          <button class="language-button" type="button" data-language="ja">日本語</button>
+        </div>
+
+        <div id="user-menu" class="user-menu" hidden>
+          <span id="nickname-badge" class="nickname-badge"></span>
+          <button id="new-feedback-button" class="primary-button header-button" type="button">
+            Give feedback
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="nickname-view" class="nickname-view" aria-labelledby="nickname-title">
+        <div class="nickname-panel">
+          <p id="nickname-eyebrow" class="eyebrow">WELCOME</p>
+          <h1 id="nickname-title">Choose your nickname</h1>
+          <p id="nickname-description" class="nickname-description">
+            This name will appear next to the feedback you share.
+          </p>
+
+          <form id="nickname-form" novalidate>
+            <label id="nickname-label" class="sr-only" for="nickname-input">Nickname</label>
+            <input
+              id="nickname-input"
+              name="nickname"
+              type="text"
+              minlength="2"
+              maxlength="30"
+              autocomplete="nickname"
+              placeholder="Enter nickname"
+              required
+            />
+            <p id="nickname-error" class="field-error" role="alert"></p>
+            <button id="continue-button" class="primary-button continue-button" type="submit">
+              Continue
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section id="feedback-view" class="feedback-view" aria-labelledby="page-title" hidden>
+        <div class="hero">
+          <div>
+            <p id="board-eyebrow" class="eyebrow">COMMUNITY REQUESTS</p>
+            <h1 id="page-title">Help us improve the debug tool</h1>
+            <p id="page-subtitle">
+              Share ideas, vote on requests, and help us prioritize what matters.
+            </p>
+          </div>
+
+          <label class="sort-control" for="sort-select">
+            <span id="sort-label">Sort by</span>
+            <select id="sort-select">
+              <option id="sort-top-option" value="top">Top voted</option>
+              <option id="sort-new-option" value="new">Newest</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="loading-state" class="loading-state" aria-live="polite">Loading feedback…</div>
+
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-icon" aria-hidden="true">↟</div>
+          <h2 id="empty-title">No feedback yet</h2>
+          <p id="empty-description">Be the first to share an idea with the team.</p>
+          <button id="empty-feedback-button" class="primary-button" type="button">Give feedback</button>
+        </div>
+
+        <div id="feedback-list" class="feedback-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <dialog id="feedback-dialog" class="feedback-dialog">
+      <form id="feedback-form" method="dialog" novalidate>
+        <div class="dialog-heading">
+          <div>
+            <p id="dialog-eyebrow" class="eyebrow">SHARE AN IDEA</p>
+            <h2 id="dialog-title">Give feedback</h2>
+          </div>
+          <button id="close-dialog-button" class="icon-button" type="button" aria-label="Close">×</button>
+        </div>
+
+        <label id="feedback-title-label" for="feedback-title-input">Title</label>
+        <input
+          id="feedback-title-input"
+          name="title"
+          type="text"
+          minlength="3"
+          maxlength="100"
+          placeholder="What should we improve?"
+          required
+        />
+
+        <label id="feedback-description-label" for="feedback-description-input">Description</label>
+        <textarea
+          id="feedback-description-input"
+          name="description"
+          rows="5"
+          maxlength="600"
+          placeholder="Add details that will help the team understand your idea."
+        ></textarea>
+
+        <p id="feedback-error" class="field-error" role="alert"></p>
+
+        <div class="dialog-actions">
+          <button id="cancel-feedback-button" class="secondary-button" type="button">Cancel</button>
+          <button id="submit-feedback-button" class="primary-button" type="submit">Submit feedback</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="./config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
