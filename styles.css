@@ -180,10 +180,17 @@ button:disabled {
   padding: 8px 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
+  background: transparent;
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.nickname-badge:hover {
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 main {
@@ -270,6 +277,11 @@ select:focus {
   min-height: 72px;
   margin-top: 24px;
   font-size: 23px;
+}
+
+.nickname-cancel-button {
+  width: 100%;
+  margin-top: 12px;
 }
 
 .field-error {
@@ -373,32 +385,25 @@ select:focus {
   min-width: 0;
 }
 
-.feedback-title-row {
+.feedback-copy-row {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
   gap: 10px 16px;
 }
 
-.feedback-content h2 {
+.feedback-copy {
   margin: 0;
   font-family: "Arial Narrow", "Roboto Condensed", ui-sans-serif, sans-serif;
   font-size: clamp(23px, 2vw, 29px);
-  line-height: 1.25;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .feedback-author {
   color: var(--accent);
   font-size: 14px;
   white-space: nowrap;
-}
-
-.feedback-description {
-  margin: 13px 0 0;
-  color: #b9b9b5;
-  font-size: clamp(16px, 1.5vw, 21px);
-  line-height: 1.5;
-  overflow-wrap: anywhere;
 }
 
 .loading-state,
@@ -527,10 +532,6 @@ select:focus {
     gap: 14px;
   }
 
-  .nickname-badge {
-    display: none;
-  }
-
   .language-switcher {
     grid-template-columns: repeat(3, minmax(60px, 1fr));
   }
@@ -562,10 +563,18 @@ select:focus {
   .header-actions {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
   }
 
   .user-menu {
-    gap: 0;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .nickname-badge {
+    max-width: none;
+    padding: 8px 10px;
+    flex: 1;
   }
 
   .language-switcher {
@@ -576,6 +585,7 @@ select:focus {
   .header-button {
     min-height: 48px;
     font-size: 17px;
+    flex: 1;
   }
 
   .nickname-view {

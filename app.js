@@ -6,6 +6,12 @@ const translations = {
     nicknamePlaceholder: "Enter nickname",
     nicknameError: "Enter a nickname between 2 and 30 characters.",
     continue: "Continue",
+    editNicknameEyebrow: "YOUR PROFILE",
+    editNicknameTitle: "Change your nickname",
+    editNicknameDescription: "Your new name will also appear on feedback you already shared.",
+    saveNickname: "Save nickname",
+    changeNickname: "Change nickname",
+    nicknameSaved: "Nickname updated.",
     boardEyebrow: "COMMUNITY REQUESTS",
     pageTitle: "Help us improve the debug tool",
     pageSubtitle: "Share ideas, vote on requests, and help us prioritize what matters.",
@@ -18,13 +24,11 @@ const translations = {
     emptyDescription: "Be the first to share an idea with the team.",
     dialogEyebrow: "SHARE AN IDEA",
     feedbackTitle: "Give feedback",
-    titleLabel: "Title",
-    titlePlaceholder: "What should we improve?",
-    descriptionLabel: "Description",
+    descriptionLabel: "Feedback",
     descriptionPlaceholder: "Add details that will help the team understand your idea.",
     cancel: "Cancel",
     submit: "Submit feedback",
-    feedbackError: "Add a title between 3 and 100 characters.",
+    feedbackError: "Add a description between 3 and 600 characters.",
     feedbackSaved: "Your feedback is live.",
     voteAdded: "Vote added.",
     voteRemoved: "Vote removed.",
@@ -41,6 +45,12 @@ const translations = {
     nicknamePlaceholder: "輸入暱稱",
     nicknameError: "請輸入 2 到 30 個字元的暱稱。",
     continue: "繼續",
+    editNicknameEyebrow: "你的個人資料",
+    editNicknameTitle: "更改暱稱",
+    editNicknameDescription: "新暱稱也會套用到你之前提出的回饋。",
+    saveNickname: "儲存暱稱",
+    changeNickname: "更改暱稱",
+    nicknameSaved: "暱稱已更新。",
     boardEyebrow: "社群需求",
     pageTitle: "一起改善 Debug Tool",
     pageSubtitle: "分享想法、為需求投票，幫助我們決定最重要的優先事項。",
@@ -53,13 +63,11 @@ const translations = {
     emptyDescription: "成為第一個向團隊分享想法的人。",
     dialogEyebrow: "分享想法",
     feedbackTitle: "提出回饋",
-    titleLabel: "標題",
-    titlePlaceholder: "你希望我們改善什麼？",
-    descriptionLabel: "詳細說明",
+    descriptionLabel: "回饋內容",
     descriptionPlaceholder: "提供更多資訊，幫助團隊理解你的想法。",
     cancel: "取消",
     submit: "送出回饋",
-    feedbackError: "請輸入 3 到 100 個字元的標題。",
+    feedbackError: "請輸入 3 到 600 個字元的回饋內容。",
     feedbackSaved: "你的回饋已經發布。",
     voteAdded: "已投票。",
     voteRemoved: "已取消投票。",
@@ -76,6 +84,12 @@ const translations = {
     nicknamePlaceholder: "ニックネームを入力",
     nicknameError: "2〜30文字のニックネームを入力してください。",
     continue: "続ける",
+    editNicknameEyebrow: "プロフィール",
+    editNicknameTitle: "ニックネームを変更",
+    editNicknameDescription: "新しい名前は、以前に投稿したフィードバックにも表示されます。",
+    saveNickname: "ニックネームを保存",
+    changeNickname: "ニックネームを変更",
+    nicknameSaved: "ニックネームを更新しました。",
     boardEyebrow: "コミュニティのリクエスト",
     pageTitle: "Debug Tool の改善にご協力ください",
     pageSubtitle: "アイデアを共有して投票し、重要な項目の優先順位付けにご協力ください。",
@@ -88,13 +102,11 @@ const translations = {
     emptyDescription: "最初のアイデアをチームに共有しましょう。",
     dialogEyebrow: "アイデアを共有",
     feedbackTitle: "フィードバックを送る",
-    titleLabel: "タイトル",
-    titlePlaceholder: "何を改善すべきですか？",
-    descriptionLabel: "詳細",
+    descriptionLabel: "フィードバック",
     descriptionPlaceholder: "チームがアイデアを理解できるよう、詳細を追加してください。",
     cancel: "キャンセル",
     submit: "送信する",
-    feedbackError: "3〜100文字のタイトルを入力してください。",
+    feedbackError: "3〜600文字のフィードバックを入力してください。",
     feedbackSaved: "フィードバックを公開しました。",
     voteAdded: "投票しました。",
     voteRemoved: "投票を取り消しました。",
@@ -110,7 +122,8 @@ const storageKeys = {
   language: "debug-feedback-language",
   nickname: "debug-feedback-nickname",
   localUserId: "debug-feedback-local-user-id",
-  localFeedback: "debug-feedback-local-items-v1",
+  localFeedback: "debug-feedback-local-items-v2",
+  legacyLocalFeedback: "debug-feedback-local-items-v1",
 };
 
 const elements = {
@@ -120,6 +133,7 @@ const elements = {
   nicknameInput: document.querySelector("#nickname-input"),
   nicknameError: document.querySelector("#nickname-error"),
   continueButton: document.querySelector("#continue-button"),
+  cancelNicknameButton: document.querySelector("#cancel-nickname-button"),
   userMenu: document.querySelector("#user-menu"),
   nicknameBadge: document.querySelector("#nickname-badge"),
   newFeedbackButton: document.querySelector("#new-feedback-button"),
@@ -130,7 +144,6 @@ const elements = {
   sortSelect: document.querySelector("#sort-select"),
   feedbackDialog: document.querySelector("#feedback-dialog"),
   feedbackForm: document.querySelector("#feedback-form"),
-  feedbackTitleInput: document.querySelector("#feedback-title-input"),
   feedbackDescriptionInput: document.querySelector("#feedback-description-input"),
   feedbackError: document.querySelector("#feedback-error"),
   submitFeedbackButton: document.querySelector("#submit-feedback-button"),
@@ -140,10 +153,6 @@ const elements = {
 };
 
 const textBindings = {
-  "#nickname-eyebrow": "nicknameEyebrow",
-  "#nickname-title": "nicknameTitle",
-  "#nickname-description": "nicknameDescription",
-  "#continue-button": "continue",
   "#board-eyebrow": "boardEyebrow",
   "#page-title": "pageTitle",
   "#page-subtitle": "pageSubtitle",
@@ -157,8 +166,8 @@ const textBindings = {
   "#empty-feedback-button": "giveFeedback",
   "#dialog-eyebrow": "dialogEyebrow",
   "#dialog-title": "feedbackTitle",
-  "#feedback-title-label": "titleLabel",
   "#feedback-description-label": "descriptionLabel",
+  "#cancel-nickname-button": "cancel",
   "#cancel-feedback-button": "cancel",
   "#submit-feedback-button": "submit",
 };
@@ -169,6 +178,7 @@ const state = {
   userId: "",
   feedback: [],
   backend: null,
+  editingNickname: false,
   toastTimer: null,
 };
 
@@ -187,57 +197,34 @@ function isSupabaseConfigured() {
 }
 
 function createLocalBackend() {
-  const starterFeedback = [
-    {
-      id: "demo-1",
-      title: "Export logs as JSON",
-      description: "Allow exporting logs in JSON format for easier analysis and sharing.",
-      authorNickname: "Mika",
-      createdAt: "2026-08-06T10:00:00.000Z",
-      baseVotes: 842,
-      voterIds: [],
-    },
-    {
-      id: "demo-2",
-      title: "Filter console events",
-      description: "Add advanced filtering options for console events by level, source, and text.",
-      authorNickname: "Ray",
-      createdAt: "2026-08-05T10:00:00.000Z",
-      baseVotes: 651,
-      voterIds: [],
-    },
-    {
-      id: "demo-3",
-      title: "Keep breakpoints between sessions",
-      description: "Persist breakpoints across sessions and reloads.",
-      authorNickname: "Aki",
-      createdAt: "2026-08-04T10:00:00.000Z",
-      baseVotes: 489,
-      voterIds: [],
-    },
-    {
-      id: "demo-4",
-      title: "Improve large trace performance",
-      description: "Optimize performance when loading and viewing large trace files.",
-      authorNickname: "Chris",
-      createdAt: "2026-08-03T10:00:00.000Z",
-      baseVotes: 375,
-      voterIds: [],
-    },
-  ];
-
   function readItems() {
     const stored = localStorage.getItem(storageKeys.localFeedback);
     if (!stored) {
-      localStorage.setItem(storageKeys.localFeedback, JSON.stringify(starterFeedback));
-      return starterFeedback;
+      const legacyStored = localStorage.getItem(storageKeys.legacyLocalFeedback);
+      if (legacyStored) {
+        try {
+          const migratedItems = JSON.parse(legacyStored)
+            .filter((item) => !String(item.id).startsWith("demo-"))
+            .map((item) => ({
+              ...item,
+              description: item.description?.trim() || item.title || "",
+            }));
+          writeItems(migratedItems);
+          return migratedItems;
+        } catch {
+          // Fall through to an empty board when legacy data cannot be read.
+        }
+      }
+
+      writeItems([]);
+      return [];
     }
 
     try {
       return JSON.parse(stored);
     } catch {
-      localStorage.setItem(storageKeys.localFeedback, JSON.stringify(starterFeedback));
-      return starterFeedback;
+      writeItems([]);
+      return [];
     }
   }
 
@@ -249,9 +236,11 @@ function createLocalBackend() {
     const voterIds = item.voterIds || [];
     return {
       id: item.id,
-      title: item.title,
       description: item.description,
-      authorNickname: item.authorNickname,
+      authorNickname:
+        item.authorId === userId
+          ? localStorage.getItem(storageKeys.nickname) || item.authorNickname
+          : item.authorNickname,
       createdAt: item.createdAt,
       voteCount: (item.baseVotes || 0) + voterIds.length,
       voted: voterIds.includes(userId),
@@ -272,6 +261,18 @@ function createLocalBackend() {
         localStorage.setItem(storageKeys.localUserId, userId);
       }
 
+      const items = readItems();
+      let didChangeAuthor = false;
+      items.forEach((item) => {
+        if (item.authorId === userId && item.authorNickname !== nickname) {
+          item.authorNickname = nickname;
+          didChangeAuthor = true;
+        }
+      });
+      if (didChangeAuthor) {
+        writeItems(items);
+      }
+
       localStorage.setItem(storageKeys.nickname, nickname);
       return { nickname, userId };
     },
@@ -280,11 +281,10 @@ function createLocalBackend() {
       return readItems().map((item) => normalize(item, userId));
     },
 
-    async createFeedback({ title, description, nickname, userId }) {
+    async createFeedback({ description, nickname, userId }) {
       const items = readItems();
       items.unshift({
         id: crypto.randomUUID(),
-        title,
         description,
         authorNickname: nickname,
         authorId: userId,
@@ -370,7 +370,7 @@ function createSupabaseBackend() {
       const { data, error } = await client
         .from("feedback")
         .select(
-          "id,title,description,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id)",
+          "id,description,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id)",
         );
       if (error) {
         throw error;
@@ -378,8 +378,7 @@ function createSupabaseBackend() {
 
       return data.map((item) => ({
         id: item.id,
-        title: item.title,
-        description: item.description || "",
+        description: item.description,
         authorNickname: item.author?.nickname || "Unknown",
         createdAt: item.created_at,
         voteCount: item.votes.length,
@@ -387,9 +386,8 @@ function createSupabaseBackend() {
       }));
     },
 
-    async createFeedback({ title, description, userId }) {
+    async createFeedback({ description, userId }) {
       const { error } = await client.from("feedback").insert({
-        title,
         description,
         author_id: userId,
       });
@@ -438,24 +436,59 @@ function applyLanguage(language) {
   });
 
   elements.nicknameInput.placeholder = t("nicknamePlaceholder");
-  elements.feedbackTitleInput.placeholder = t("titlePlaceholder");
   elements.feedbackDescriptionInput.placeholder = t("descriptionPlaceholder");
   elements.closeDialogButton.setAttribute("aria-label", t("close"));
+  renderNicknameMode();
+  updateNicknameBadge();
   renderFeedback();
 }
 
-function showNicknameView() {
+function renderNicknameMode() {
+  document.querySelector("#nickname-eyebrow").textContent = t(
+    state.editingNickname ? "editNicknameEyebrow" : "nicknameEyebrow",
+  );
+  document.querySelector("#nickname-title").textContent = t(
+    state.editingNickname ? "editNicknameTitle" : "nicknameTitle",
+  );
+  document.querySelector("#nickname-description").textContent = t(
+    state.editingNickname ? "editNicknameDescription" : "nicknameDescription",
+  );
+  elements.continueButton.textContent = t(state.editingNickname ? "saveNickname" : "continue");
+  elements.cancelNicknameButton.hidden = !state.editingNickname;
+}
+
+function updateNicknameBadge() {
+  if (!state.nickname) {
+    return;
+  }
+
+  elements.nicknameBadge.textContent = `@${state.nickname} ✎`;
+  elements.nicknameBadge.setAttribute("aria-label", t("changeNickname"));
+  elements.nicknameBadge.title = t("changeNickname");
+}
+
+function showNicknameView(editingNickname = false) {
+  state.editingNickname = editingNickname;
   elements.nicknameView.hidden = false;
   elements.feedbackView.hidden = true;
   elements.userMenu.hidden = true;
-  requestAnimationFrame(() => elements.nicknameInput.focus());
+  elements.nicknameError.textContent = "";
+  elements.nicknameInput.value = editingNickname ? state.nickname : "";
+  renderNicknameMode();
+  requestAnimationFrame(() => {
+    elements.nicknameInput.focus();
+    if (editingNickname) {
+      elements.nicknameInput.select();
+    }
+  });
 }
 
 async function showFeedbackView() {
+  state.editingNickname = false;
   elements.nicknameView.hidden = true;
   elements.feedbackView.hidden = false;
   elements.userMenu.hidden = false;
-  elements.nicknameBadge.textContent = `@${state.nickname}`;
+  updateNicknameBadge();
   await refreshFeedback();
 }
 
@@ -510,7 +543,7 @@ function renderFeedback() {
     voteButton.setAttribute("aria-pressed", String(item.voted));
     voteButton.setAttribute(
       "aria-label",
-      `${item.voted ? t("removeVoteFor") : t("voteFor")} ${item.title}`,
+      `${item.voted ? t("removeVoteFor") : t("voteFor")} ${item.description}`,
     );
     voteButton.addEventListener("click", () => handleVote(item, voteButton));
 
@@ -521,22 +554,19 @@ function renderFeedback() {
     const content = document.createElement("div");
     content.className = "feedback-content";
 
-    const titleRow = document.createElement("div");
-    titleRow.className = "feedback-title-row";
+    const copyRow = document.createElement("div");
+    copyRow.className = "feedback-copy-row";
 
-    const title = document.createElement("h2");
-    title.textContent = item.title;
+    const description = document.createElement("h2");
+    description.className = "feedback-copy";
+    description.textContent = item.description;
 
     const author = document.createElement("span");
     author.className = "feedback-author";
     author.textContent = `${t("by")} ${item.authorNickname}`;
 
-    const description = document.createElement("p");
-    description.className = "feedback-description";
-    description.textContent = item.description;
-
-    titleRow.append(title, author);
-    content.append(titleRow, description);
+    copyRow.append(description, author);
+    content.append(copyRow);
     article.append(voteButton, voteCount, content);
     elements.feedbackList.append(article);
   });
@@ -563,7 +593,7 @@ function openFeedbackDialog() {
   elements.feedbackForm.reset();
   elements.feedbackError.textContent = "";
   elements.feedbackDialog.showModal();
-  requestAnimationFrame(() => elements.feedbackTitleInput.focus());
+  requestAnimationFrame(() => elements.feedbackDescriptionInput.focus());
 }
 
 function closeFeedbackDialog() {
@@ -581,6 +611,7 @@ function showToast(message) {
 
 async function handleNicknameSubmit(event) {
   event.preventDefault();
+  const wasEditing = state.editingNickname;
   const nickname = elements.nicknameInput.value.trim();
   if (nickname.length < 2 || nickname.length > 30) {
     elements.nicknameError.textContent = t("nicknameError");
@@ -596,6 +627,9 @@ async function handleNicknameSubmit(event) {
     state.nickname = user.nickname;
     state.userId = user.userId;
     await showFeedbackView();
+    if (wasEditing) {
+      showToast(t("nicknameSaved"));
+    }
   } catch (error) {
     console.error(error);
     elements.nicknameError.textContent = t("genericError");
@@ -606,11 +640,10 @@ async function handleNicknameSubmit(event) {
 
 async function handleFeedbackSubmit(event) {
   event.preventDefault();
-  const title = elements.feedbackTitleInput.value.trim();
   const description = elements.feedbackDescriptionInput.value.trim();
-  if (title.length < 3 || title.length > 100) {
+  if (description.length < 3 || description.length > 600) {
     elements.feedbackError.textContent = t("feedbackError");
-    elements.feedbackTitleInput.focus();
+    elements.feedbackDescriptionInput.focus();
     return;
   }
 
@@ -619,7 +652,6 @@ async function handleFeedbackSubmit(event) {
 
   try {
     await state.backend.createFeedback({
-      title,
       description,
       nickname: state.nickname,
       userId: state.userId,
@@ -640,6 +672,8 @@ function bindEvents() {
     button.addEventListener("click", () => applyLanguage(button.dataset.language));
   });
   elements.nicknameForm.addEventListener("submit", handleNicknameSubmit);
+  elements.nicknameBadge.addEventListener("click", () => showNicknameView(true));
+  elements.cancelNicknameButton.addEventListener("click", () => showFeedbackView());
   elements.feedbackForm.addEventListener("submit", handleFeedbackSubmit);
   elements.newFeedbackButton.addEventListener("click", openFeedbackDialog);
   elements.emptyFeedbackButton.addEventListener("click", openFeedbackDialog);

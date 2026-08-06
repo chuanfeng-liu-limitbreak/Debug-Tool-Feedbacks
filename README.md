@@ -1,10 +1,10 @@
 # Debug tool feedbacks
 
-A static feedback board designed for GitHub Pages with Supabase providing anonymous identity, persistent feedback, and one vote per browser identity.
+A static feedback board designed for GitHub Pages with editable nicknames, description-only submissions, and one vote per browser identity. Supabase provides anonymous identity and persistent feedback.
 
 ## Preview locally
 
-Serve this folder with any static file server. When Supabase is not configured, the app uses browser-local demo data so the complete flow can be previewed immediately.
+Serve this folder with any static file server. When Supabase is not configured, the app stores feedback in the browser so the complete flow can be previewed immediately.
 
 ```sh
 python3 -m http.server 4173
