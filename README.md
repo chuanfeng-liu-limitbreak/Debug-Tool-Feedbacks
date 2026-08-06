@@ -24,11 +24,9 @@ For local testing, replace the placeholders in `config.js`. Never put a `service
 ## Deploy with GitHub Pages
 
 1. Create a GitHub repository and push this folder to its `main` branch.
-2. In **Settings → Secrets and variables → Actions**, add:
-   - `SUPABASE_URL`
-   - `SUPABASE_ANON_KEY`
-3. In **Settings → Pages → Build and deployment**, select **GitHub Actions**.
-4. Push to `main` or run the deployment workflow manually.
+2. In **Settings → Pages → Build and deployment**, select **Deploy from a branch**.
+3. Select the `main` branch and the `/ (root)` folder, then save.
+4. Replace the placeholders in `config.js` with the Supabase project URL and publishable/anon key.
 
 The Supabase publishable/anon key is designed for browser use. The Row Level Security policies in `supabase/schema.sql` are what protect the data.
 
