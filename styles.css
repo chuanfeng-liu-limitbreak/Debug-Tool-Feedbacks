@@ -310,11 +310,26 @@ select:focus {
   font-size: clamp(36px, 3.4vw, 52px);
 }
 
-.hero > div > p:last-child {
+.hero #page-subtitle {
   margin: 18px 0 0;
   color: #c9c9c5;
   font-size: clamp(18px, 1.6vw, 24px);
   line-height: 1.5;
+}
+
+.build-link {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.build-link a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.build-link a:hover {
+  color: var(--accent-light);
 }
 
 .sort-control {
