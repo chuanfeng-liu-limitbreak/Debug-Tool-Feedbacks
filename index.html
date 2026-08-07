@@ -24,6 +24,9 @@
 
         <div id="user-menu" class="user-menu" hidden>
           <button id="nickname-badge" class="nickname-badge" type="button"></button>
+          <button id="admin-mode-button" class="secondary-button header-button admin-mode-button" type="button">
+            Admin
+          </button>
           <button id="new-feedback-button" class="primary-button header-button" type="button">
             Give feedback
           </button>
@@ -105,13 +108,18 @@
             <p id="page-subtitle">Share feedback and vote on what we should work on next.</p>
           </div>
 
-          <label class="sort-control" for="sort-select">
-            <span id="sort-label">Sort by</span>
-            <select id="sort-select">
-              <option id="sort-top-option" value="top">Top voted</option>
-              <option id="sort-new-option" value="new">Newest</option>
-            </select>
-          </label>
+          <div class="board-controls">
+            <button id="clear-feedback-button" class="secondary-button danger-button" type="button" hidden>
+              Clear all feedback
+            </button>
+            <label class="sort-control" for="sort-select">
+              <span id="sort-label">Sort by</span>
+              <select id="sort-select">
+                <option id="sort-top-option" value="top">Top voted</option>
+                <option id="sort-new-option" value="new">Newest</option>
+              </select>
+            </label>
+          </div>
         </div>
 
         <div id="loading-state" class="loading-state" aria-live="polite">Loading feedback…</div>
@@ -153,6 +161,38 @@
         <div class="dialog-actions">
           <button id="cancel-feedback-button" class="secondary-button" type="button">Cancel</button>
           <button id="submit-feedback-button" class="primary-button" type="submit">Submit feedback</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="admin-dialog" class="feedback-dialog">
+      <form id="admin-form" method="dialog" novalidate>
+        <div class="dialog-heading">
+          <div>
+            <p id="admin-eyebrow" class="eyebrow">ADMIN ACCESS</p>
+            <h2 id="admin-title">Administrator mode</h2>
+          </div>
+          <button id="close-admin-dialog-button" class="icon-button" type="button" aria-label="Close">×</button>
+        </div>
+
+        <p id="admin-description" class="dialog-description">
+          Enter the administrator password to manage all feedback.
+        </p>
+        <label id="admin-password-label" for="admin-password-input">Administrator password</label>
+        <input
+          id="admin-password-input"
+          name="admin-password"
+          type="password"
+          maxlength="128"
+          autocomplete="current-password"
+          placeholder="Enter administrator password"
+          required
+        />
+        <p id="admin-error" class="field-error" role="alert"></p>
+
+        <div class="dialog-actions">
+          <button id="cancel-admin-button" class="secondary-button" type="button">Cancel</button>
+          <button id="unlock-admin-button" class="primary-button" type="submit">Enable admin mode</button>
         </div>
       </form>
     </dialog>

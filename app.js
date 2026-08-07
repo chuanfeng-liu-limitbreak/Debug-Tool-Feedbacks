@@ -7,6 +7,21 @@ const translations = {
     accessError: "Incorrect password. Please try again.",
     accessRequired: "Enter the password to continue.",
     unlock: "Continue",
+    adminMode: "Admin",
+    adminActive: "Admin ✓",
+    adminEyebrow: "ADMIN ACCESS",
+    adminTitle: "Administrator mode",
+    adminDescription: "Enter the administrator password to manage all feedback.",
+    adminPasswordLabel: "Administrator password",
+    adminPasswordPlaceholder: "Enter administrator password",
+    adminRequired: "Enter the administrator password.",
+    adminError: "Incorrect administrator password. Please try again.",
+    enableAdmin: "Enable admin mode",
+    adminEnabled: "Administrator mode enabled.",
+    adminAlreadyEnabled: "Administrator mode is already enabled.",
+    clearAllFeedback: "Clear all feedback",
+    clearAllConfirmation: "Delete every feedback item and vote? This cannot be undone.",
+    feedbackCleared: "All feedback has been cleared.",
     nicknameEyebrow: "WELCOME",
     nicknameTitle: "Choose your nickname",
     nicknameDescription: "This name will appear next to the feedback you share.",
@@ -60,6 +75,21 @@ const translations = {
     accessError: "密碼不正確，請再試一次。",
     accessRequired: "請輸入密碼以繼續。",
     unlock: "繼續",
+    adminMode: "管理員",
+    adminActive: "管理員 ✓",
+    adminEyebrow: "管理員權限",
+    adminTitle: "管理員模式",
+    adminDescription: "輸入管理員密碼以管理所有回饋。",
+    adminPasswordLabel: "管理員密碼",
+    adminPasswordPlaceholder: "輸入管理員密碼",
+    adminRequired: "請輸入管理員密碼。",
+    adminError: "管理員密碼不正確，請再試一次。",
+    enableAdmin: "啟用管理員模式",
+    adminEnabled: "管理員模式已啟用。",
+    adminAlreadyEnabled: "管理員模式已經啟用。",
+    clearAllFeedback: "清除全部回饋",
+    clearAllConfirmation: "確定要刪除所有回饋與投票嗎？此操作無法復原。",
+    feedbackCleared: "所有回饋已清除。",
     nicknameEyebrow: "歡迎",
     nicknameTitle: "選擇你的暱稱",
     nicknameDescription: "這個名稱會顯示在你提出的回饋旁。",
@@ -113,6 +143,21 @@ const translations = {
     accessError: "パスワードが正しくありません。もう一度お試しください。",
     accessRequired: "続行するにはパスワードを入力してください。",
     unlock: "続ける",
+    adminMode: "管理者",
+    adminActive: "管理者 ✓",
+    adminEyebrow: "管理者アクセス",
+    adminTitle: "管理者モード",
+    adminDescription: "すべてのフィードバックを管理するには、管理者パスワードを入力してください。",
+    adminPasswordLabel: "管理者パスワード",
+    adminPasswordPlaceholder: "管理者パスワードを入力",
+    adminRequired: "管理者パスワードを入力してください。",
+    adminError: "管理者パスワードが正しくありません。もう一度お試しください。",
+    enableAdmin: "管理者モードを有効にする",
+    adminEnabled: "管理者モードを有効にしました。",
+    adminAlreadyEnabled: "管理者モードはすでに有効です。",
+    clearAllFeedback: "すべて削除",
+    clearAllConfirmation: "すべてのフィードバックと投票を削除しますか？この操作は元に戻せません。",
+    feedbackCleared: "すべてのフィードバックを削除しました。",
     nicknameEyebrow: "ようこそ",
     nicknameTitle: "ニックネームを選択",
     nicknameDescription: "投稿したフィードバックに、この名前が表示されます。",
@@ -183,6 +228,8 @@ const elements = {
   cancelNicknameButton: document.querySelector("#cancel-nickname-button"),
   userMenu: document.querySelector("#user-menu"),
   nicknameBadge: document.querySelector("#nickname-badge"),
+  adminModeButton: document.querySelector("#admin-mode-button"),
+  clearFeedbackButton: document.querySelector("#clear-feedback-button"),
   newFeedbackButton: document.querySelector("#new-feedback-button"),
   emptyFeedbackButton: document.querySelector("#empty-feedback-button"),
   loadingState: document.querySelector("#loading-state"),
@@ -196,6 +243,13 @@ const elements = {
   submitFeedbackButton: document.querySelector("#submit-feedback-button"),
   closeDialogButton: document.querySelector("#close-dialog-button"),
   cancelFeedbackButton: document.querySelector("#cancel-feedback-button"),
+  adminDialog: document.querySelector("#admin-dialog"),
+  adminForm: document.querySelector("#admin-form"),
+  adminPasswordInput: document.querySelector("#admin-password-input"),
+  adminError: document.querySelector("#admin-error"),
+  unlockAdminButton: document.querySelector("#unlock-admin-button"),
+  closeAdminDialogButton: document.querySelector("#close-admin-dialog-button"),
+  cancelAdminButton: document.querySelector("#cancel-admin-button"),
   toast: document.querySelector("#toast"),
 };
 
@@ -204,6 +258,12 @@ const textBindings = {
   "#access-title": "accessTitle",
   "#access-description": "accessDescription",
   "#access-submit-button": "unlock",
+  "#admin-eyebrow": "adminEyebrow",
+  "#admin-title": "adminTitle",
+  "#admin-description": "adminDescription",
+  "#admin-password-label": "adminPasswordLabel",
+  "#unlock-admin-button": "enableAdmin",
+  "#clear-feedback-button": "clearAllFeedback",
   "#board-eyebrow": "boardEyebrow",
   "#page-title": "pageTitle",
   "#page-subtitle": "pageSubtitle",
@@ -220,6 +280,7 @@ const textBindings = {
   "#feedback-description-label": "descriptionLabel",
   "#cancel-nickname-button": "cancel",
   "#cancel-feedback-button": "cancel",
+  "#cancel-admin-button": "cancel",
   "#submit-feedback-button": "submit",
 };
 
@@ -229,6 +290,7 @@ const state = {
   userId: "",
   feedback: [],
   backend: null,
+  isAdmin: false,
   editingNickname: false,
   toastTimer: null,
 };
@@ -314,12 +376,22 @@ function createLocalBackend() {
   }
 
   return {
+    supportsAdmin: false,
+
     async hasAccess() {
       return true;
     },
 
     async verifyAccess() {
       return true;
+    },
+
+    async hasAdminAccess() {
+      return false;
+    },
+
+    async verifyAdminAccess() {
+      return false;
     },
 
     async restoreUser() {
@@ -369,14 +441,18 @@ function createLocalBackend() {
       writeItems(items);
     },
 
-    async deleteFeedback(feedbackId, userId) {
+    async deleteFeedback(feedbackId, userId, isAdmin = false) {
       const items = readItems();
       const item = items.find((candidate) => String(candidate.id) === String(feedbackId));
-      if (!item || item.authorId !== userId) {
+      if (!item || (!isAdmin && item.authorId !== userId)) {
         throw new Error("Feedback cannot be deleted by this user");
       }
 
       writeItems(items.filter((candidate) => String(candidate.id) !== String(feedbackId)));
+    },
+
+    async clearAllFeedback() {
+      writeItems([]);
     },
 
     async setVote(feedbackId, userId, value) {
@@ -421,6 +497,8 @@ function createSupabaseBackend() {
   }
 
   return {
+    supportsAdmin: true,
+
     async hasAccess() {
       await ensureSession();
       const { data, error } = await client.rpc("has_feedback_access");
@@ -433,6 +511,26 @@ function createSupabaseBackend() {
     async verifyAccess(password) {
       await ensureSession();
       const { data, error } = await client.rpc("verify_feedback_password", {
+        p_password: password,
+      });
+      if (error) {
+        throw error;
+      }
+      return data === true;
+    },
+
+    async hasAdminAccess() {
+      await ensureSession();
+      const { data, error } = await client.rpc("has_feedback_admin_access");
+      if (error) {
+        throw error;
+      }
+      return data === true;
+    },
+
+    async verifyAdminAccess(password) {
+      await ensureSession();
+      const { data, error } = await client.rpc("verify_feedback_admin_password", {
         p_password: password,
       });
       if (error) {
@@ -503,19 +601,25 @@ function createSupabaseBackend() {
       }
     },
 
-    async deleteFeedback(feedbackId, userId) {
-      const { data, error } = await client
-        .from("feedback")
-        .delete()
-        .eq("id", feedbackId)
-        .eq("author_id", userId)
-        .select("id")
-        .maybeSingle();
+    async deleteFeedback(feedbackId, userId, isAdmin = false) {
+      let query = client.from("feedback").delete().eq("id", feedbackId);
+      if (!isAdmin) {
+        query = query.eq("author_id", userId);
+      }
+
+      const { data, error } = await query.select("id").maybeSingle();
       if (error) {
         throw error;
       }
       if (!data) {
         throw new Error("Feedback cannot be deleted by this user");
+      }
+    },
+
+    async clearAllFeedback() {
+      const { error } = await client.rpc("clear_all_feedback");
+      if (error) {
+        throw error;
       }
     },
 
@@ -564,10 +668,13 @@ function applyLanguage(language) {
 
   elements.nicknameInput.placeholder = t("nicknamePlaceholder");
   elements.accessPasswordInput.placeholder = t("accessPlaceholder");
+  elements.adminPasswordInput.placeholder = t("adminPasswordPlaceholder");
   elements.feedbackDescriptionInput.placeholder = t("descriptionPlaceholder");
   elements.closeDialogButton.setAttribute("aria-label", t("close"));
+  elements.closeAdminDialogButton.setAttribute("aria-label", t("close"));
   renderNicknameMode();
   updateNicknameBadge();
+  updateAdminUi();
   renderFeedback();
 }
 
@@ -593,6 +700,13 @@ function updateNicknameBadge() {
   elements.nicknameBadge.textContent = `@${state.nickname} ✎`;
   elements.nicknameBadge.setAttribute("aria-label", t("changeNickname"));
   elements.nicknameBadge.title = t("changeNickname");
+}
+
+function updateAdminUi() {
+  elements.adminModeButton.textContent = t(state.isAdmin ? "adminActive" : "adminMode");
+  elements.adminModeButton.classList.toggle("is-active", state.isAdmin);
+  elements.adminModeButton.setAttribute("aria-pressed", String(state.isAdmin));
+  elements.clearFeedbackButton.hidden = !state.isAdmin;
 }
 
 function showAccessView() {
@@ -628,7 +742,9 @@ async function showFeedbackView() {
   elements.nicknameView.hidden = true;
   elements.feedbackView.hidden = false;
   elements.userMenu.hidden = false;
+  elements.adminModeButton.hidden = !state.backend.supportsAdmin;
   updateNicknameBadge();
+  updateAdminUi();
   await refreshFeedback();
 }
 
@@ -726,7 +842,7 @@ function renderFeedback() {
     meta.className = "feedback-meta";
     meta.append(author);
 
-    if (item.isOwner) {
+    if (item.isOwner || state.isAdmin) {
       const deleteButton = document.createElement("button");
       deleteButton.className = "delete-feedback-button";
       deleteButton.type = "button";
@@ -770,13 +886,13 @@ async function handleVote(item, selectedValue, buttons) {
 }
 
 async function handleDeleteFeedback(item, button) {
-  if (!item.isOwner || !window.confirm(t("deleteConfirmation"))) {
+  if ((!item.isOwner && !state.isAdmin) || !window.confirm(t("deleteConfirmation"))) {
     return;
   }
 
   button.disabled = true;
   try {
-    await state.backend.deleteFeedback(item.id, state.userId);
+    await state.backend.deleteFeedback(item.id, state.userId, state.isAdmin);
     state.feedback = state.feedback.filter(
       (candidate) => String(candidate.id) !== String(item.id),
     );
@@ -800,6 +916,22 @@ function closeFeedbackDialog() {
   elements.feedbackDialog.close();
 }
 
+function openAdminDialog() {
+  if (state.isAdmin) {
+    showToast(t("adminAlreadyEnabled"));
+    return;
+  }
+
+  elements.adminForm.reset();
+  elements.adminError.textContent = "";
+  elements.adminDialog.showModal();
+  requestAnimationFrame(() => elements.adminPasswordInput.focus());
+}
+
+function closeAdminDialog() {
+  elements.adminDialog.close();
+}
+
 function showToast(message) {
   clearTimeout(state.toastTimer);
   elements.toast.textContent = message;
@@ -810,6 +942,9 @@ function showToast(message) {
 }
 
 async function continueAfterAccess() {
+  state.isAdmin = state.backend.supportsAdmin
+    ? await state.backend.hasAdminAccess()
+    : false;
   const user = await state.backend.restoreUser();
   if (user) {
     state.nickname = user.nickname;
@@ -819,6 +954,58 @@ async function continueAfterAccess() {
   }
 
   showNicknameView();
+}
+
+async function handleAdminSubmit(event) {
+  event.preventDefault();
+  const password = elements.adminPasswordInput.value;
+  if (!password) {
+    elements.adminError.textContent = t("adminRequired");
+    elements.adminPasswordInput.focus();
+    return;
+  }
+
+  elements.adminError.textContent = "";
+  elements.unlockAdminButton.disabled = true;
+
+  try {
+    const isValid = await state.backend.verifyAdminAccess(password);
+    if (!isValid) {
+      elements.adminError.textContent = t("adminError");
+      elements.adminPasswordInput.select();
+      return;
+    }
+
+    state.isAdmin = true;
+    closeAdminDialog();
+    updateAdminUi();
+    renderFeedback();
+    showToast(t("adminEnabled"));
+  } catch (error) {
+    console.error(error);
+    elements.adminError.textContent = t("genericError");
+  } finally {
+    elements.unlockAdminButton.disabled = false;
+  }
+}
+
+async function handleClearAllFeedback() {
+  if (!state.isAdmin || !window.confirm(t("clearAllConfirmation"))) {
+    return;
+  }
+
+  elements.clearFeedbackButton.disabled = true;
+  try {
+    await state.backend.clearAllFeedback();
+    state.feedback = [];
+    renderFeedback();
+    showToast(t("feedbackCleared"));
+  } catch (error) {
+    console.error(error);
+    showToast(t("genericError"));
+  } finally {
+    elements.clearFeedbackButton.disabled = false;
+  }
 }
 
 async function handleAccessSubmit(event) {
@@ -916,16 +1103,26 @@ function bindEvents() {
   elements.accessForm.addEventListener("submit", handleAccessSubmit);
   elements.nicknameForm.addEventListener("submit", handleNicknameSubmit);
   elements.nicknameBadge.addEventListener("click", () => showNicknameView(true));
+  elements.adminModeButton.addEventListener("click", openAdminDialog);
+  elements.clearFeedbackButton.addEventListener("click", handleClearAllFeedback);
   elements.cancelNicknameButton.addEventListener("click", () => showFeedbackView());
   elements.feedbackForm.addEventListener("submit", handleFeedbackSubmit);
   elements.newFeedbackButton.addEventListener("click", openFeedbackDialog);
   elements.emptyFeedbackButton.addEventListener("click", openFeedbackDialog);
   elements.closeDialogButton.addEventListener("click", closeFeedbackDialog);
   elements.cancelFeedbackButton.addEventListener("click", closeFeedbackDialog);
+  elements.adminForm.addEventListener("submit", handleAdminSubmit);
+  elements.closeAdminDialogButton.addEventListener("click", closeAdminDialog);
+  elements.cancelAdminButton.addEventListener("click", closeAdminDialog);
   elements.sortSelect.addEventListener("change", renderFeedback);
   elements.feedbackDialog.addEventListener("click", (event) => {
     if (event.target === elements.feedbackDialog) {
       closeFeedbackDialog();
+    }
+  });
+  elements.adminDialog.addEventListener("click", (event) => {
+    if (event.target === elements.adminDialog) {
+      closeAdminDialog();
     }
   });
 }

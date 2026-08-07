@@ -176,6 +176,19 @@ button:disabled {
   min-width: 188px;
 }
 
+.admin-mode-button {
+  min-width: 112px;
+  min-height: 46px;
+  padding: 0 18px;
+  font-size: 16px;
+}
+
+.admin-mode-button.is-active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(255, 152, 29, 0.06);
+}
+
 .nickname-badge {
   max-width: 180px;
   padding: 8px 12px;
@@ -315,6 +328,26 @@ select:focus {
   color: #c9c9c5;
   font-size: clamp(18px, 1.6vw, 24px);
   line-height: 1.5;
+}
+
+.board-controls {
+  display: flex;
+  align-items: end;
+  gap: 14px;
+  flex: 0 0 auto;
+}
+
+.danger-button {
+  min-height: 46px;
+  padding: 0 16px;
+  border-color: rgba(255, 116, 116, 0.5);
+  color: var(--danger);
+  font-size: 15px;
+}
+
+.danger-button:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: rgba(255, 116, 116, 0.08);
 }
 
 .sort-control {
@@ -535,6 +568,12 @@ select:focus {
   font-weight: 650;
 }
 
+.dialog-description {
+  margin: -8px 0 24px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .feedback-dialog input {
   min-height: 58px;
 }
@@ -614,12 +653,13 @@ select:focus {
   .user-menu {
     width: 100%;
     gap: 8px;
+    flex-wrap: wrap;
   }
 
   .nickname-badge {
     max-width: none;
     padding: 8px 10px;
-    flex: 1;
+    flex: 1 1 100%;
   }
 
   .language-switcher {
@@ -630,7 +670,7 @@ select:focus {
   .header-button {
     min-height: 48px;
     font-size: 17px;
-    flex: 1;
+    flex: 1 1 calc(50% - 4px);
   }
 
   .nickname-view {
@@ -651,6 +691,16 @@ select:focus {
     align-items: flex-start;
     flex-direction: column;
     gap: 24px;
+  }
+
+  .board-controls {
+    width: 100%;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .danger-button {
+    width: 100%;
   }
 
   .sort-control {

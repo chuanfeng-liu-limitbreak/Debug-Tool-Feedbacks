@@ -1,6 +1,6 @@
 # Debug tool feedbacks
 
-A static feedback board designed for GitHub Pages with a shared-password gate, editable nicknames, description-only submissions, owner-only deletion, and one upvote or downvote per browser identity. Supabase provides anonymous identity, server-side password verification, and persistent feedback.
+A static feedback board designed for GitHub Pages with a shared-password gate, a separate administrator mode, editable nicknames, description-only submissions, owner deletion, and one upvote or downvote per browser identity. Supabase provides anonymous identity, server-side password verification, administrator authorization, and persistent feedback.
 
 ## Preview locally
 
@@ -28,6 +28,18 @@ set password_hash = excluded.password_hash,
     updated_at = excluded.updated_at;
 ```
 
+6. Set a separate administrator password:
+
+```sql
+insert into private.feedback_admin_config (id, password_hash, updated_at)
+values (true, extensions.crypt('<admin-password>', extensions.gen_salt('bf', 12)), now())
+on conflict (id) do update
+set password_hash = excluded.password_hash,
+    updated_at = excluded.updated_at;
+
+delete from public.feedback_admin_access;
+```
+
 For local testing, replace the placeholders in `config.js`. Never put a `service_role` key in this site.
 
 ## Deploy with GitHub Pages
@@ -40,6 +52,8 @@ For local testing, replace the placeholders in `config.js`. Never put a `service
 The Supabase publishable key is designed for browser use. The Row Level Security policies in `supabase/schema.sql` are what protect the data.
 
 The password is verified inside Postgres and is never stored in the site source. Five failed attempts lock that browser identity for 15 minutes. Existing authorized browsers stay authorized until their row is removed from `public.feedback_access`.
+
+Administrator mode uses a separate server-side password and lockout counter. An administrator can delete any individual feedback item or clear the full board. Changing the administrator password should also clear `public.feedback_admin_access` so previously authorized browsers must authenticate again.
 
 ## Vote identity limitation
 
