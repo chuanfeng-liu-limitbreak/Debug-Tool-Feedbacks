@@ -1,6 +1,6 @@
 # Debug tool feedbacks
 
-A static feedback board designed for GitHub Pages with editable nicknames, description-only submissions, owner-only deletion, and one upvote or downvote per browser identity. Supabase provides anonymous identity and persistent feedback.
+A static feedback board designed for GitHub Pages with a shared-password gate, editable nicknames, description-only submissions, owner-only deletion, and one upvote or downvote per browser identity. Supabase provides anonymous identity, server-side password verification, and persistent feedback.
 
 ## Preview locally
 
@@ -18,6 +18,15 @@ Open `http://localhost:4173`.
 2. Open **SQL Editor**, paste `supabase/schema.sql`, and run it.
 3. Open **Authentication → Providers → Anonymous Sign-Ins** and enable anonymous sign-ins.
 4. Copy the project URL and publishable key from the project's **Connect** dialog.
+5. Set the shared password from the SQL Editor without committing it to Git:
+
+```sql
+insert into private.feedback_access_config (id, password_hash, updated_at)
+values (true, extensions.crypt('<new-password>', extensions.gen_salt('bf', 12)), now())
+on conflict (id) do update
+set password_hash = excluded.password_hash,
+    updated_at = excluded.updated_at;
+```
 
 For local testing, replace the placeholders in `config.js`. Never put a `service_role` key in this site.
 
@@ -29,6 +38,8 @@ For local testing, replace the placeholders in `config.js`. Never put a `service
 4. Add the Supabase project URL and publishable key to `config.js`.
 
 The Supabase publishable key is designed for browser use. The Row Level Security policies in `supabase/schema.sql` are what protect the data.
+
+The password is verified inside Postgres and is never stored in the site source. Five failed attempts lock that browser identity for 15 minutes. Existing authorized browsers stay authorized until their row is removed from `public.feedback_access`.
 
 ## Vote identity limitation
 

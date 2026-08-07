@@ -32,7 +32,34 @@
     </header>
 
     <main>
-      <section id="nickname-view" class="nickname-view" aria-labelledby="nickname-title">
+      <section id="access-view" class="nickname-view" aria-labelledby="access-title">
+        <div class="nickname-panel">
+          <p id="access-eyebrow" class="eyebrow">PRIVATE BOARD</p>
+          <h1 id="access-title">Enter password</h1>
+          <p id="access-description" class="nickname-description">
+            Use the team password to continue.
+          </p>
+
+          <form id="access-form" novalidate>
+            <label id="access-label" class="sr-only" for="access-password-input">Password</label>
+            <input
+              id="access-password-input"
+              name="password"
+              type="password"
+              maxlength="128"
+              autocomplete="current-password"
+              placeholder="Enter password"
+              required
+            />
+            <p id="access-error" class="field-error" role="alert"></p>
+            <button id="access-submit-button" class="primary-button continue-button" type="submit">
+              Continue
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section id="nickname-view" class="nickname-view" aria-labelledby="nickname-title" hidden>
         <div class="nickname-panel">
           <p id="nickname-eyebrow" class="eyebrow">WELCOME</p>
           <h1 id="nickname-title">Choose your nickname</h1>

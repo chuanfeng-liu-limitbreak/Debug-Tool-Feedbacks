@@ -1,5 +1,12 @@
 const translations = {
   en: {
+    accessEyebrow: "PRIVATE BOARD",
+    accessTitle: "Enter password",
+    accessDescription: "Use the team password to continue.",
+    accessPlaceholder: "Enter password",
+    accessError: "Incorrect password. Please try again.",
+    accessRequired: "Enter the password to continue.",
+    unlock: "Continue",
     nicknameEyebrow: "WELCOME",
     nicknameTitle: "Choose your nickname",
     nicknameDescription: "This name will appear next to the feedback you share.",
@@ -46,6 +53,13 @@ const translations = {
     by: "by",
   },
   zh: {
+    accessEyebrow: "內部回饋",
+    accessTitle: "輸入密碼",
+    accessDescription: "請輸入團隊共用密碼以繼續。",
+    accessPlaceholder: "輸入密碼",
+    accessError: "密碼不正確，請再試一次。",
+    accessRequired: "請輸入密碼以繼續。",
+    unlock: "繼續",
     nicknameEyebrow: "歡迎",
     nicknameTitle: "選擇你的暱稱",
     nicknameDescription: "這個名稱會顯示在你提出的回饋旁。",
@@ -92,6 +106,13 @@ const translations = {
     by: "by",
   },
   ja: {
+    accessEyebrow: "社内フィードバック",
+    accessTitle: "パスワードを入力",
+    accessDescription: "チーム共通のパスワードを入力してください。",
+    accessPlaceholder: "パスワードを入力",
+    accessError: "パスワードが正しくありません。もう一度お試しください。",
+    accessRequired: "続行するにはパスワードを入力してください。",
+    unlock: "続ける",
     nicknameEyebrow: "ようこそ",
     nicknameTitle: "ニックネームを選択",
     nicknameDescription: "投稿したフィードバックに、この名前が表示されます。",
@@ -148,6 +169,11 @@ const storageKeys = {
 };
 
 const elements = {
+  accessView: document.querySelector("#access-view"),
+  accessForm: document.querySelector("#access-form"),
+  accessPasswordInput: document.querySelector("#access-password-input"),
+  accessError: document.querySelector("#access-error"),
+  accessSubmitButton: document.querySelector("#access-submit-button"),
   nicknameView: document.querySelector("#nickname-view"),
   feedbackView: document.querySelector("#feedback-view"),
   nicknameForm: document.querySelector("#nickname-form"),
@@ -174,6 +200,10 @@ const elements = {
 };
 
 const textBindings = {
+  "#access-eyebrow": "accessEyebrow",
+  "#access-title": "accessTitle",
+  "#access-description": "accessDescription",
+  "#access-submit-button": "unlock",
   "#board-eyebrow": "boardEyebrow",
   "#page-title": "pageTitle",
   "#page-subtitle": "pageSubtitle",
@@ -284,6 +314,14 @@ function createLocalBackend() {
   }
 
   return {
+    async hasAccess() {
+      return true;
+    },
+
+    async verifyAccess() {
+      return true;
+    },
+
     async restoreUser() {
       const nickname = localStorage.getItem(storageKeys.nickname);
       const userId = localStorage.getItem(storageKeys.localUserId);
@@ -365,17 +403,47 @@ function createSupabaseBackend() {
   const publishableKey = config.supabasePublishableKey || config.supabaseAnonKey;
   const client = window.supabase.createClient(config.supabaseUrl, publishableKey);
 
+  async function ensureSession() {
+    const { data, error } = await client.auth.getSession();
+    if (error) {
+      throw error;
+    }
+
+    if (data.session) {
+      return data.session;
+    }
+
+    const result = await client.auth.signInAnonymously();
+    if (result.error) {
+      throw result.error;
+    }
+    return result.data.session;
+  }
+
   return {
-    async restoreUser() {
-      const { data, error } = await client.auth.getSession();
+    async hasAccess() {
+      await ensureSession();
+      const { data, error } = await client.rpc("has_feedback_access");
       if (error) {
         throw error;
       }
+      return data === true;
+    },
 
-      const userId = data.session?.user?.id;
-      if (!userId) {
-        return null;
+    async verifyAccess(password) {
+      await ensureSession();
+      const { data, error } = await client.rpc("verify_feedback_password", {
+        p_password: password,
+      });
+      if (error) {
+        throw error;
       }
+      return data === true;
+    },
+
+    async restoreUser() {
+      const session = await ensureSession();
+      const userId = session.user.id;
 
       const { data: profile, error: profileError } = await client
         .from("profiles")
@@ -390,20 +458,8 @@ function createSupabaseBackend() {
     },
 
     async ensureUser(nickname) {
-      let { data: sessionData, error: sessionError } = await client.auth.getSession();
-      if (sessionError) {
-        throw sessionError;
-      }
-
-      if (!sessionData.session) {
-        const result = await client.auth.signInAnonymously();
-        if (result.error) {
-          throw result.error;
-        }
-        sessionData = { session: result.data.session };
-      }
-
-      const userId = sessionData.session.user.id;
+      const session = await ensureSession();
+      const userId = session.user.id;
       const { error } = await client.from("profiles").upsert({ id: userId, nickname });
       if (error) {
         throw error;
@@ -507,6 +563,7 @@ function applyLanguage(language) {
   });
 
   elements.nicknameInput.placeholder = t("nicknamePlaceholder");
+  elements.accessPasswordInput.placeholder = t("accessPlaceholder");
   elements.feedbackDescriptionInput.placeholder = t("descriptionPlaceholder");
   elements.closeDialogButton.setAttribute("aria-label", t("close"));
   renderNicknameMode();
@@ -538,8 +595,19 @@ function updateNicknameBadge() {
   elements.nicknameBadge.title = t("changeNickname");
 }
 
+function showAccessView() {
+  elements.accessView.hidden = false;
+  elements.nicknameView.hidden = true;
+  elements.feedbackView.hidden = true;
+  elements.userMenu.hidden = true;
+  elements.accessError.textContent = "";
+  elements.accessPasswordInput.value = "";
+  requestAnimationFrame(() => elements.accessPasswordInput.focus());
+}
+
 function showNicknameView(editingNickname = false) {
   state.editingNickname = editingNickname;
+  elements.accessView.hidden = true;
   elements.nicknameView.hidden = false;
   elements.feedbackView.hidden = true;
   elements.userMenu.hidden = true;
@@ -556,6 +624,7 @@ function showNicknameView(editingNickname = false) {
 
 async function showFeedbackView() {
   state.editingNickname = false;
+  elements.accessView.hidden = true;
   elements.nicknameView.hidden = true;
   elements.feedbackView.hidden = false;
   elements.userMenu.hidden = false;
@@ -740,6 +809,48 @@ function showToast(message) {
   }, 2600);
 }
 
+async function continueAfterAccess() {
+  const user = await state.backend.restoreUser();
+  if (user) {
+    state.nickname = user.nickname;
+    state.userId = user.userId;
+    await showFeedbackView();
+    return;
+  }
+
+  showNicknameView();
+}
+
+async function handleAccessSubmit(event) {
+  event.preventDefault();
+  const password = elements.accessPasswordInput.value;
+  if (!password) {
+    elements.accessError.textContent = t("accessRequired");
+    elements.accessPasswordInput.focus();
+    return;
+  }
+
+  elements.accessError.textContent = "";
+  elements.accessSubmitButton.disabled = true;
+
+  try {
+    const isValid = await state.backend.verifyAccess(password);
+    if (!isValid) {
+      elements.accessError.textContent = t("accessError");
+      elements.accessPasswordInput.select();
+      return;
+    }
+
+    elements.accessForm.reset();
+    await continueAfterAccess();
+  } catch (error) {
+    console.error(error);
+    elements.accessError.textContent = t("genericError");
+  } finally {
+    elements.accessSubmitButton.disabled = false;
+  }
+}
+
 async function handleNicknameSubmit(event) {
   event.preventDefault();
   const wasEditing = state.editingNickname;
@@ -802,6 +913,7 @@ function bindEvents() {
   document.querySelectorAll(".language-button").forEach((button) => {
     button.addEventListener("click", () => applyLanguage(button.dataset.language));
   });
+  elements.accessForm.addEventListener("submit", handleAccessSubmit);
   elements.nicknameForm.addEventListener("submit", handleNicknameSubmit);
   elements.nicknameBadge.addEventListener("click", () => showNicknameView(true));
   elements.cancelNicknameButton.addEventListener("click", () => showFeedbackView());
@@ -824,18 +936,19 @@ async function initialize() {
   applyLanguage(state.language);
 
   try {
-    const user = await state.backend.restoreUser();
-    if (user) {
-      state.nickname = user.nickname;
-      state.userId = user.userId;
-      await showFeedbackView();
+    const hasAccess = await state.backend.hasAccess();
+    if (!hasAccess) {
+      showAccessView();
       return;
     }
+
+    await continueAfterAccess();
+    return;
   } catch (error) {
     console.error(error);
   }
 
-  showNicknameView();
+  showAccessView();
 }
 
 initialize();

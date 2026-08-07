@@ -1,3 +1,21 @@
+create extension if not exists pgcrypto with schema extensions;
+
+create schema if not exists private;
+revoke all on schema private from public, anon, authenticated;
+
+create table if not exists private.feedback_access_config (
+  id boolean primary key default true check (id),
+  password_hash text not null,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists private.feedback_access_attempts (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  failed_attempts integer not null default 0,
+  locked_until timestamptz,
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   nickname text not null check (char_length(trim(nickname)) between 2 and 30),
@@ -44,6 +62,104 @@ create table if not exists public.votes (
   constraint votes_value_check check (value in (-1, 1))
 );
 
+create table if not exists public.feedback_access (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  granted_at timestamptz not null default now()
+);
+
+alter table public.feedback_access enable row level security;
+revoke all on public.feedback_access from anon, authenticated;
+
+create or replace function public.has_feedback_access()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1
+    from public.feedback_access
+    where user_id = (select auth.uid())
+  );
+$$;
+
+create or replace function public.verify_feedback_password(p_password text)
+returns boolean
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  current_user_id uuid := auth.uid();
+  stored_hash text;
+  failed_count integer := 0;
+  current_lock timestamptz;
+begin
+  if current_user_id is null or p_password is null or char_length(p_password) > 128 then
+    return false;
+  end if;
+
+  select password_hash
+  into stored_hash
+  from private.feedback_access_config
+  where id = true;
+
+  if stored_hash is null then
+    return false;
+  end if;
+
+  select failed_attempts, locked_until
+  into failed_count, current_lock
+  from private.feedback_access_attempts
+  where user_id = current_user_id;
+
+  if current_lock is not null and current_lock > now() then
+    return false;
+  end if;
+
+  if extensions.crypt(p_password, stored_hash) = stored_hash then
+    insert into public.feedback_access (user_id)
+    values (current_user_id)
+    on conflict (user_id) do nothing;
+
+    delete from private.feedback_access_attempts
+    where user_id = current_user_id;
+
+    return true;
+  end if;
+
+  if current_lock is not null then
+    failed_count := 0;
+  end if;
+  failed_count := coalesce(failed_count, 0) + 1;
+
+  insert into private.feedback_access_attempts (
+    user_id,
+    failed_attempts,
+    locked_until,
+    updated_at
+  )
+  values (
+    current_user_id,
+    failed_count,
+    case when failed_count >= 5 then now() + interval '15 minutes' end,
+    now()
+  )
+  on conflict (user_id) do update
+  set failed_attempts = excluded.failed_attempts,
+      locked_until = excluded.locked_until,
+      updated_at = excluded.updated_at;
+
+  return false;
+end;
+$$;
+
+revoke all on function public.has_feedback_access() from public, anon;
+revoke all on function public.verify_feedback_password(text) from public, anon;
+grant execute on function public.has_feedback_access() to authenticated;
+grant execute on function public.verify_feedback_password(text) to authenticated;
+
 alter table public.votes add column if not exists value smallint not null default 1;
 alter table public.votes drop constraint if exists votes_value_check;
 alter table public.votes
@@ -60,63 +176,63 @@ drop policy if exists "Authenticated users can read profiles" on public.profiles
 create policy "Authenticated users can read profiles"
 on public.profiles for select
 to authenticated
-using (true);
+using (public.has_feedback_access());
 
 drop policy if exists "Users can create their own profile" on public.profiles;
 create policy "Users can create their own profile"
 on public.profiles for insert
 to authenticated
-with check ((select auth.uid()) = id);
+with check (public.has_feedback_access() and (select auth.uid()) = id);
 
 drop policy if exists "Users can update their own profile" on public.profiles;
 create policy "Users can update their own profile"
 on public.profiles for update
 to authenticated
-using ((select auth.uid()) = id)
-with check ((select auth.uid()) = id);
+using (public.has_feedback_access() and (select auth.uid()) = id)
+with check (public.has_feedback_access() and (select auth.uid()) = id);
 
 drop policy if exists "Authenticated users can read feedback" on public.feedback;
 create policy "Authenticated users can read feedback"
 on public.feedback for select
 to authenticated
-using (true);
+using (public.has_feedback_access());
 
 drop policy if exists "Users can create their own feedback" on public.feedback;
 create policy "Users can create their own feedback"
 on public.feedback for insert
 to authenticated
-with check ((select auth.uid()) = author_id);
+with check (public.has_feedback_access() and (select auth.uid()) = author_id);
 
 drop policy if exists "Users can delete their own feedback" on public.feedback;
 create policy "Users can delete their own feedback"
 on public.feedback for delete
 to authenticated
-using ((select auth.uid()) = author_id);
+using (public.has_feedback_access() and (select auth.uid()) = author_id);
 
 drop policy if exists "Authenticated users can read votes" on public.votes;
 create policy "Authenticated users can read votes"
 on public.votes for select
 to authenticated
-using (true);
+using (public.has_feedback_access());
 
 drop policy if exists "Users can add their own vote" on public.votes;
 create policy "Users can add their own vote"
 on public.votes for insert
 to authenticated
-with check ((select auth.uid()) = user_id);
+with check (public.has_feedback_access() and (select auth.uid()) = user_id);
 
 drop policy if exists "Users can update their own vote" on public.votes;
 create policy "Users can update their own vote"
 on public.votes for update
 to authenticated
-using ((select auth.uid()) = user_id)
-with check ((select auth.uid()) = user_id);
+using (public.has_feedback_access() and (select auth.uid()) = user_id)
+with check (public.has_feedback_access() and (select auth.uid()) = user_id);
 
 drop policy if exists "Users can remove their own vote" on public.votes;
 create policy "Users can remove their own vote"
 on public.votes for delete
 to authenticated
-using ((select auth.uid()) = user_id);
+using (public.has_feedback_access() and (select auth.uid()) = user_id);
 
 grant usage on schema public to authenticated;
 grant select, insert, update on public.profiles to authenticated;
