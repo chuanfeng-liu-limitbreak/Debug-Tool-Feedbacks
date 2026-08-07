@@ -30,12 +30,15 @@ const translations = {
     submit: "Submit feedback",
     feedbackError: "Add a description between 3 and 600 characters.",
     feedbackSaved: "Your feedback is live.",
-    voteAdded: "Vote added.",
+    upvoteAdded: "Upvote added.",
+    downvoteAdded: "Downvote added.",
     voteRemoved: "Vote removed.",
     genericError: "Something went wrong. Please try again.",
     close: "Close",
-    voteFor: "Vote for",
-    removeVoteFor: "Remove vote from",
+    upvoteFor: "Upvote",
+    removeUpvoteFor: "Remove upvote from",
+    downvoteFor: "Downvote",
+    removeDownvoteFor: "Remove downvote from",
     deleteFeedback: "Delete",
     deleteFeedbackLabel: "Delete feedback",
     deleteConfirmation: "Delete this feedback? This cannot be undone.",
@@ -73,12 +76,15 @@ const translations = {
     submit: "送出回饋",
     feedbackError: "請輸入 3 到 600 個字元的回饋內容。",
     feedbackSaved: "你的回饋已經發布。",
-    voteAdded: "已投票。",
+    upvoteAdded: "已投贊成票。",
+    downvoteAdded: "已投反對票。",
     voteRemoved: "已取消投票。",
     genericError: "發生錯誤，請再試一次。",
     close: "關閉",
-    voteFor: "投票給",
-    removeVoteFor: "取消投票給",
+    upvoteFor: "投贊成票給",
+    removeUpvoteFor: "取消贊成票：",
+    downvoteFor: "投反對票給",
+    removeDownvoteFor: "取消反對票：",
     deleteFeedback: "刪除",
     deleteFeedbackLabel: "刪除回饋",
     deleteConfirmation: "確定要刪除這則回饋嗎？刪除後無法復原。",
@@ -116,12 +122,15 @@ const translations = {
     submit: "送信する",
     feedbackError: "3〜600文字のフィードバックを入力してください。",
     feedbackSaved: "フィードバックを公開しました。",
-    voteAdded: "投票しました。",
+    upvoteAdded: "賛成票を投じました。",
+    downvoteAdded: "反対票を投じました。",
     voteRemoved: "投票を取り消しました。",
     genericError: "エラーが発生しました。もう一度お試しください。",
     close: "閉じる",
-    voteFor: "投票：",
-    removeVoteFor: "投票を取り消す：",
+    upvoteFor: "賛成票：",
+    removeUpvoteFor: "賛成票を取り消す：",
+    downvoteFor: "反対票：",
+    removeDownvoteFor: "反対票を取り消す：",
     deleteFeedback: "削除",
     deleteFeedbackLabel: "フィードバックを削除",
     deleteConfirmation: "このフィードバックを削除しますか？この操作は元に戻せません。",
@@ -245,8 +254,19 @@ function createLocalBackend() {
     localStorage.setItem(storageKeys.localFeedback, JSON.stringify(items));
   }
 
+  function getVoteValues(item) {
+    const voteValues = { ...(item.voteValues || {}) };
+    (item.voterIds || []).forEach((userId) => {
+      if (!voteValues[userId]) {
+        voteValues[userId] = 1;
+      }
+    });
+    return voteValues;
+  }
+
   function normalize(item, userId) {
-    const voterIds = item.voterIds || [];
+    const voteValues = getVoteValues(item);
+    const userVote = voteValues[userId] || 0;
     return {
       id: item.id,
       description: item.description,
@@ -255,8 +275,10 @@ function createLocalBackend() {
           ? localStorage.getItem(storageKeys.nickname) || item.authorNickname
           : item.authorNickname,
       createdAt: item.createdAt,
-      voteCount: (item.baseVotes || 0) + voterIds.length,
-      voted: voterIds.includes(userId),
+      voteCount:
+        (item.baseVotes || 0) +
+        Object.values(voteValues).reduce((total, value) => total + Number(value), 0),
+      userVote,
       isOwner: item.authorId === userId,
     };
   }
@@ -304,7 +326,7 @@ function createLocalBackend() {
         authorId: userId,
         createdAt: new Date().toISOString(),
         baseVotes: 0,
-        voterIds: [],
+        voteValues: {},
       });
       writeItems(items);
     },
@@ -319,19 +341,19 @@ function createLocalBackend() {
       writeItems(items.filter((candidate) => String(candidate.id) !== String(feedbackId)));
     },
 
-    async toggleVote(feedbackId, userId, shouldVote) {
+    async setVote(feedbackId, userId, value) {
       const items = readItems();
       const item = items.find((candidate) => String(candidate.id) === String(feedbackId));
       if (!item) {
         throw new Error("Feedback not found");
       }
 
-      item.voterIds = item.voterIds || [];
-      if (shouldVote && !item.voterIds.includes(userId)) {
-        item.voterIds.push(userId);
-      }
-      if (!shouldVote) {
-        item.voterIds = item.voterIds.filter((id) => id !== userId);
+      item.voteValues = getVoteValues(item);
+      delete item.voterIds;
+      if (value === 0) {
+        delete item.voteValues[userId];
+      } else {
+        item.voteValues[userId] = value;
       }
       writeItems(items);
     },
@@ -395,21 +417,24 @@ function createSupabaseBackend() {
       const { data, error } = await client
         .from("feedback")
         .select(
-          "id,description,author_id,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id)",
+          "id,description,author_id,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id,value)",
         );
       if (error) {
         throw error;
       }
 
-      return data.map((item) => ({
-        id: item.id,
-        description: item.description,
-        authorNickname: item.author?.nickname || "Unknown",
-        createdAt: item.created_at,
-        voteCount: item.votes.length,
-        voted: item.votes.some((vote) => vote.user_id === userId),
-        isOwner: item.author_id === userId,
-      }));
+      return data.map((item) => {
+        const userVote = item.votes.find((vote) => vote.user_id === userId)?.value || 0;
+        return {
+          id: item.id,
+          description: item.description,
+          authorNickname: item.author?.nickname || "Unknown",
+          createdAt: item.created_at,
+          voteCount: item.votes.reduce((total, vote) => total + vote.value, 0),
+          userVote,
+          isOwner: item.author_id === userId,
+        };
+      });
     },
 
     async createFeedback({ description, userId }) {
@@ -438,13 +463,17 @@ function createSupabaseBackend() {
       }
     },
 
-    async toggleVote(feedbackId, userId, shouldVote) {
-      if (shouldVote) {
-        const { error } = await client.from("votes").insert({
-          feedback_id: feedbackId,
-          user_id: userId,
-        });
-        if (error && error.code !== "23505") {
+    async setVote(feedbackId, userId, value) {
+      if (value !== 0) {
+        const { error } = await client.from("votes").upsert(
+          {
+            feedback_id: feedbackId,
+            user_id: userId,
+            value,
+          },
+          { onConflict: "feedback_id,user_id" },
+        );
+        if (error) {
           throw error;
         }
         return;
@@ -578,20 +607,37 @@ function renderFeedback() {
     const article = document.createElement("article");
     article.className = "feedback-item";
 
-    const voteButton = document.createElement("button");
-    voteButton.className = `vote-button${item.voted ? " is-voted" : ""}`;
-    voteButton.type = "button";
-    voteButton.textContent = "↑";
-    voteButton.setAttribute("aria-pressed", String(item.voted));
-    voteButton.setAttribute(
+    const voteControls = document.createElement("div");
+    voteControls.className = "vote-controls";
+
+    const upvoteButton = document.createElement("button");
+    upvoteButton.className = `vote-button is-upvote${item.userVote === 1 ? " is-selected" : ""}`;
+    upvoteButton.type = "button";
+    upvoteButton.textContent = "↑";
+    upvoteButton.setAttribute("aria-pressed", String(item.userVote === 1));
+    upvoteButton.setAttribute(
       "aria-label",
-      `${item.voted ? t("removeVoteFor") : t("voteFor")} ${item.description}`,
+      `${t(item.userVote === 1 ? "removeUpvoteFor" : "upvoteFor")} ${item.description}`,
     );
-    voteButton.addEventListener("click", () => handleVote(item, voteButton));
 
     const voteCount = document.createElement("span");
     voteCount.className = "vote-count";
     voteCount.textContent = item.voteCount.toLocaleString();
+
+    const downvoteButton = document.createElement("button");
+    downvoteButton.className = `vote-button is-downvote${item.userVote === -1 ? " is-selected" : ""}`;
+    downvoteButton.type = "button";
+    downvoteButton.textContent = "↓";
+    downvoteButton.setAttribute("aria-pressed", String(item.userVote === -1));
+    downvoteButton.setAttribute(
+      "aria-label",
+      `${t(item.userVote === -1 ? "removeDownvoteFor" : "downvoteFor")} ${item.description}`,
+    );
+
+    const voteButtons = [upvoteButton, downvoteButton];
+    upvoteButton.addEventListener("click", () => handleVote(item, 1, voteButtons));
+    downvoteButton.addEventListener("click", () => handleVote(item, -1, voteButtons));
+    voteControls.append(upvoteButton, voteCount, downvoteButton);
 
     const content = document.createElement("div");
     content.className = "feedback-content";
@@ -626,25 +672,31 @@ function renderFeedback() {
 
     copyRow.append(description, meta);
     content.append(copyRow);
-    article.append(voteButton, voteCount, content);
+    article.append(voteControls, content);
     elements.feedbackList.append(article);
   });
 }
 
-async function handleVote(item, button) {
-  const shouldVote = !item.voted;
-  button.disabled = true;
+async function handleVote(item, selectedValue, buttons) {
+  const nextValue = item.userVote === selectedValue ? 0 : selectedValue;
+  buttons.forEach((button) => {
+    button.disabled = true;
+  });
 
   try {
-    await state.backend.toggleVote(item.id, state.userId, shouldVote);
-    item.voted = shouldVote;
-    item.voteCount += shouldVote ? 1 : -1;
+    await state.backend.setVote(item.id, state.userId, nextValue);
+    item.voteCount += nextValue - item.userVote;
+    item.userVote = nextValue;
     renderFeedback();
-    showToast(t(shouldVote ? "voteAdded" : "voteRemoved"));
+    const notificationKey =
+      nextValue === 0 ? "voteRemoved" : nextValue === 1 ? "upvoteAdded" : "downvoteAdded";
+    showToast(t(notificationKey));
   } catch (error) {
     console.error(error);
     showToast(t("genericError"));
-    button.disabled = false;
+    buttons.forEach((button) => {
+      button.disabled = false;
+    });
   }
 }
 

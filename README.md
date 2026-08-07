@@ -1,6 +1,6 @@
 # Debug tool feedbacks
 
-A static feedback board designed for GitHub Pages with editable nicknames, description-only submissions, owner-only deletion, and one vote per browser identity. Supabase provides anonymous identity and persistent feedback.
+A static feedback board designed for GitHub Pages with editable nicknames, description-only submissions, owner-only deletion, and one upvote or downvote per browser identity. Supabase provides anonymous identity and persistent feedback.
 
 ## Preview locally
 

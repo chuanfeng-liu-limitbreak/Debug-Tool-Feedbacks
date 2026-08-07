@@ -10,6 +10,7 @@
   --accent: #ff981d;
   --accent-light: #ffb347;
   --accent-dark: #bd6000;
+  --downvote: #67a9ff;
   --danger: #ff7474;
   --focus: rgba(255, 152, 29, 0.32);
   --max-width: 1540px;
@@ -342,21 +343,28 @@ select:focus {
   padding: 34px 0;
   border-bottom: 1px solid var(--line);
   display: grid;
-  grid-template-columns: 86px 92px minmax(0, 1fr);
+  grid-template-columns: 236px minmax(0, 1fr);
   align-items: center;
   gap: 26px;
 }
 
+.vote-controls {
+  display: grid;
+  grid-template-columns: 64px 64px 64px;
+  align-items: center;
+  gap: 12px;
+}
+
 .vote-button {
-  width: 84px;
-  height: 84px;
+  width: 64px;
+  height: 64px;
   border: 1px solid var(--line-strong);
   border-radius: 9px;
   background: rgba(10, 12, 14, 0.55);
   color: var(--accent);
   display: grid;
   place-items: center;
-  font-size: 54px;
+  font-size: 42px;
   font-weight: 300;
   line-height: 1;
   transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
@@ -368,10 +376,25 @@ select:focus {
   transform: translateY(-2px);
 }
 
-.vote-button.is-voted {
+.vote-button.is-upvote.is-selected {
   border-color: var(--accent);
   background: var(--accent);
   color: #17110a;
+}
+
+.vote-button.is-downvote {
+  color: var(--downvote);
+}
+
+.vote-button.is-downvote:hover:not(:disabled) {
+  border-color: var(--downvote);
+  background: rgba(103, 169, 255, 0.07);
+}
+
+.vote-button.is-downvote.is-selected {
+  border-color: var(--downvote);
+  background: var(--downvote);
+  color: #07101d;
 }
 
 .vote-count {
@@ -637,26 +660,32 @@ select:focus {
   .feedback-item {
     min-height: 0;
     padding: 27px 0;
-    grid-template-columns: 62px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: start;
-    gap: 16px;
+    gap: 18px;
+  }
+
+  .vote-controls {
+    grid-column: 1;
+    grid-row: 2;
+    grid-template-columns: 52px 56px 52px;
+    gap: 8px;
   }
 
   .vote-button {
-    width: 60px;
-    height: 60px;
-    font-size: 40px;
+    width: 52px;
+    height: 52px;
+    font-size: 34px;
   }
 
   .vote-count {
-    grid-column: 1;
     text-align: center;
     font-size: 21px;
   }
 
   .feedback-content {
-    grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .feedback-dialog form {

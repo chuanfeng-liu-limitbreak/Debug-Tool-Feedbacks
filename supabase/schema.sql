@@ -38,9 +38,16 @@ check (char_length(trim(description)) between 3 and 600);
 create table if not exists public.votes (
   feedback_id bigint not null references public.feedback(id) on delete cascade,
   user_id uuid not null references public.profiles(id) on delete cascade,
+  value smallint not null default 1,
   created_at timestamptz not null default now(),
-  primary key (feedback_id, user_id)
+  primary key (feedback_id, user_id),
+  constraint votes_value_check check (value in (-1, 1))
 );
+
+alter table public.votes add column if not exists value smallint not null default 1;
+alter table public.votes drop constraint if exists votes_value_check;
+alter table public.votes
+add constraint votes_value_check check (value in (-1, 1));
 
 create index if not exists idx_feedback_created_at
 on public.feedback(created_at desc);
@@ -98,6 +105,13 @@ on public.votes for insert
 to authenticated
 with check ((select auth.uid()) = user_id);
 
+drop policy if exists "Users can update their own vote" on public.votes;
+create policy "Users can update their own vote"
+on public.votes for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
 drop policy if exists "Users can remove their own vote" on public.votes;
 create policy "Users can remove their own vote"
 on public.votes for delete
@@ -107,7 +121,7 @@ using ((select auth.uid()) = user_id);
 grant usage on schema public to authenticated;
 grant select, insert, update on public.profiles to authenticated;
 grant select, insert, delete on public.feedback to authenticated;
-grant select, insert, delete on public.votes to authenticated;
+grant select, insert, update, delete on public.votes to authenticated;
 grant usage, select on sequence public.feedback_id_seq to authenticated;
 
 analyze public.feedback;
