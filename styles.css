@@ -393,6 +393,7 @@ select:focus {
 }
 
 .feedback-copy {
+  flex: 1 1 480px;
   margin: 0;
   font-family: "Arial Narrow", "Roboto Condensed", ui-sans-serif, sans-serif;
   font-size: clamp(23px, 2vw, 29px);
@@ -404,6 +405,27 @@ select:focus {
   color: var(--accent);
   font-size: 14px;
   white-space: nowrap;
+}
+
+.feedback-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.delete-feedback-button {
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 116, 116, 0.45);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--danger);
+  font-size: 13px;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.delete-feedback-button:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: rgba(255, 116, 116, 0.08);
 }
 
 .loading-state,

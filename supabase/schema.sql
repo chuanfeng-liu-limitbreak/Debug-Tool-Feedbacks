@@ -80,6 +80,12 @@ on public.feedback for insert
 to authenticated
 with check ((select auth.uid()) = author_id);
 
+drop policy if exists "Users can delete their own feedback" on public.feedback;
+create policy "Users can delete their own feedback"
+on public.feedback for delete
+to authenticated
+using ((select auth.uid()) = author_id);
+
 drop policy if exists "Authenticated users can read votes" on public.votes;
 create policy "Authenticated users can read votes"
 on public.votes for select
@@ -100,7 +106,7 @@ using ((select auth.uid()) = user_id);
 
 grant usage on schema public to authenticated;
 grant select, insert, update on public.profiles to authenticated;
-grant select, insert on public.feedback to authenticated;
+grant select, insert, delete on public.feedback to authenticated;
 grant select, insert, delete on public.votes to authenticated;
 grant usage, select on sequence public.feedback_id_seq to authenticated;
 

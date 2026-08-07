@@ -36,6 +36,10 @@ const translations = {
     close: "Close",
     voteFor: "Vote for",
     removeVoteFor: "Remove vote from",
+    deleteFeedback: "Delete",
+    deleteFeedbackLabel: "Delete feedback",
+    deleteConfirmation: "Delete this feedback? This cannot be undone.",
+    feedbackDeleted: "Feedback deleted.",
     by: "by",
   },
   zh: {
@@ -75,6 +79,10 @@ const translations = {
     close: "關閉",
     voteFor: "投票給",
     removeVoteFor: "取消投票給",
+    deleteFeedback: "刪除",
+    deleteFeedbackLabel: "刪除回饋",
+    deleteConfirmation: "確定要刪除這則回饋嗎？刪除後無法復原。",
+    feedbackDeleted: "回饋已刪除。",
     by: "by",
   },
   ja: {
@@ -114,6 +122,10 @@ const translations = {
     close: "閉じる",
     voteFor: "投票：",
     removeVoteFor: "投票を取り消す：",
+    deleteFeedback: "削除",
+    deleteFeedbackLabel: "フィードバックを削除",
+    deleteConfirmation: "このフィードバックを削除しますか？この操作は元に戻せません。",
+    feedbackDeleted: "フィードバックを削除しました。",
     by: "by",
   },
 };
@@ -244,6 +256,7 @@ function createLocalBackend() {
       createdAt: item.createdAt,
       voteCount: (item.baseVotes || 0) + voterIds.length,
       voted: voterIds.includes(userId),
+      isOwner: item.authorId === userId,
     };
   }
 
@@ -293,6 +306,16 @@ function createLocalBackend() {
         voterIds: [],
       });
       writeItems(items);
+    },
+
+    async deleteFeedback(feedbackId, userId) {
+      const items = readItems();
+      const item = items.find((candidate) => String(candidate.id) === String(feedbackId));
+      if (!item || item.authorId !== userId) {
+        throw new Error("Feedback cannot be deleted by this user");
+      }
+
+      writeItems(items.filter((candidate) => String(candidate.id) !== String(feedbackId)));
     },
 
     async toggleVote(feedbackId, userId, shouldVote) {
@@ -370,7 +393,7 @@ function createSupabaseBackend() {
       const { data, error } = await client
         .from("feedback")
         .select(
-          "id,description,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id)",
+          "id,description,author_id,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id)",
         );
       if (error) {
         throw error;
@@ -383,6 +406,7 @@ function createSupabaseBackend() {
         createdAt: item.created_at,
         voteCount: item.votes.length,
         voted: item.votes.some((vote) => vote.user_id === userId),
+        isOwner: item.author_id === userId,
       }));
     },
 
@@ -393,6 +417,22 @@ function createSupabaseBackend() {
       });
       if (error) {
         throw error;
+      }
+    },
+
+    async deleteFeedback(feedbackId, userId) {
+      const { data, error } = await client
+        .from("feedback")
+        .delete()
+        .eq("id", feedbackId)
+        .eq("author_id", userId)
+        .select("id")
+        .maybeSingle();
+      if (error) {
+        throw error;
+      }
+      if (!data) {
+        throw new Error("Feedback cannot be deleted by this user");
       }
     },
 
@@ -565,7 +605,24 @@ function renderFeedback() {
     author.className = "feedback-author";
     author.textContent = `${t("by")} ${item.authorNickname}`;
 
-    copyRow.append(description, author);
+    const meta = document.createElement("div");
+    meta.className = "feedback-meta";
+    meta.append(author);
+
+    if (item.isOwner) {
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "delete-feedback-button";
+      deleteButton.type = "button";
+      deleteButton.textContent = t("deleteFeedback");
+      deleteButton.setAttribute(
+        "aria-label",
+        `${t("deleteFeedbackLabel")}: ${item.description}`,
+      );
+      deleteButton.addEventListener("click", () => handleDeleteFeedback(item, deleteButton));
+      meta.append(deleteButton);
+    }
+
+    copyRow.append(description, meta);
     content.append(copyRow);
     article.append(voteButton, voteCount, content);
     elements.feedbackList.append(article);
@@ -582,6 +639,26 @@ async function handleVote(item, button) {
     item.voteCount += shouldVote ? 1 : -1;
     renderFeedback();
     showToast(t(shouldVote ? "voteAdded" : "voteRemoved"));
+  } catch (error) {
+    console.error(error);
+    showToast(t("genericError"));
+    button.disabled = false;
+  }
+}
+
+async function handleDeleteFeedback(item, button) {
+  if (!item.isOwner || !window.confirm(t("deleteConfirmation"))) {
+    return;
+  }
+
+  button.disabled = true;
+  try {
+    await state.backend.deleteFeedback(item.id, state.userId);
+    state.feedback = state.feedback.filter(
+      (candidate) => String(candidate.id) !== String(item.id),
+    );
+    renderFeedback();
+    showToast(t("feedbackDeleted"));
   } catch (error) {
     console.error(error);
     showToast(t("genericError"));
