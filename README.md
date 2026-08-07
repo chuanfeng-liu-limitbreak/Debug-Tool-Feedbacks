@@ -17,7 +17,7 @@ Open `http://localhost:4173`.
 1. Create a Supabase project.
 2. Open **SQL Editor**, paste `supabase/schema.sql`, and run it.
 3. Open **Authentication → Providers → Anonymous Sign-Ins** and enable anonymous sign-ins.
-4. Copy the project URL and publishable/anon key from **Project Settings → API**.
+4. Copy the project URL and publishable key from the project's **Connect** dialog.
 
 For local testing, replace the placeholders in `config.js`. Never put a `service_role` key in this site.
 
@@ -26,9 +26,9 @@ For local testing, replace the placeholders in `config.js`. Never put a `service
 1. Create a GitHub repository and push this folder to its `main` branch.
 2. In **Settings → Pages → Build and deployment**, select **Deploy from a branch**.
 3. Select the `main` branch and the `/ (root)` folder, then save.
-4. Replace the placeholders in `config.js` with the Supabase project URL and publishable/anon key.
+4. Add the Supabase project URL and publishable key to `config.js`.
 
-The Supabase publishable/anon key is designed for browser use. The Row Level Security policies in `supabase/schema.sql` are what protect the data.
+The Supabase publishable key is designed for browser use. The Row Level Security policies in `supabase/schema.sql` are what protect the data.
 
 ## Vote identity limitation
 

@@ -200,11 +200,12 @@ function t(key) {
 
 function isSupabaseConfigured() {
   const config = window.FEEDBACK_APP_CONFIG || {};
+  const publishableKey = config.supabasePublishableKey || config.supabaseAnonKey;
   return Boolean(
     config.supabaseUrl &&
-      config.supabaseAnonKey &&
+      publishableKey &&
       !config.supabaseUrl.startsWith("__") &&
-      !config.supabaseAnonKey.startsWith("__"),
+      !publishableKey.startsWith("__"),
   );
 }
 
@@ -339,7 +340,8 @@ function createLocalBackend() {
 
 function createSupabaseBackend() {
   const config = window.FEEDBACK_APP_CONFIG;
-  const client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+  const publishableKey = config.supabasePublishableKey || config.supabaseAnonKey;
+  const client = window.supabase.createClient(config.supabaseUrl, publishableKey);
 
   return {
     async restoreUser() {
