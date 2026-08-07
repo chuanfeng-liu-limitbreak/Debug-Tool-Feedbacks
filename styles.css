@@ -383,21 +383,23 @@ select:focus {
 
 .vote-controls {
   display: grid;
-  grid-template-columns: 64px 64px 64px;
+  grid-template-columns: repeat(2, minmax(96px, 1fr));
   align-items: center;
   gap: 12px;
 }
 
 .vote-button {
-  width: 64px;
+  width: 100%;
   height: 64px;
+  padding: 0 14px;
   border: 1px solid var(--line-strong);
   border-radius: 9px;
   background: rgba(10, 12, 14, 0.55);
   color: var(--accent);
   display: grid;
-  place-items: center;
-  font-size: 42px;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
   font-weight: 300;
   line-height: 1;
   transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
@@ -431,10 +433,17 @@ select:focus {
 }
 
 .vote-count {
+  min-width: 0;
+  text-align: right;
   font-family: "Arial Narrow", "Roboto Condensed", ui-sans-serif, sans-serif;
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 740;
   font-variant-numeric: tabular-nums;
+}
+
+.vote-symbol {
+  font-size: 34px;
+  font-weight: 300;
 }
 
 .feedback-content {
@@ -718,19 +727,22 @@ select:focus {
   .vote-controls {
     grid-column: 1;
     grid-row: 2;
-    grid-template-columns: 52px 56px 52px;
+    grid-template-columns: repeat(2, minmax(92px, 1fr));
     gap: 8px;
   }
 
   .vote-button {
-    width: 52px;
+    width: 100%;
     height: 52px;
-    font-size: 34px;
+    padding: 0 12px;
   }
 
   .vote-count {
-    text-align: center;
     font-size: 21px;
+  }
+
+  .vote-symbol {
+    font-size: 29px;
   }
 
   .feedback-content {

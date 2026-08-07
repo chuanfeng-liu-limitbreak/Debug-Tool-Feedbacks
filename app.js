@@ -39,7 +39,7 @@ const translations = {
     pageSubtitle: "Share feedback and vote on what we should work on next.",
     giveFeedback: "Give feedback",
     sortBy: "Sort by",
-    topVoted: "Top voted",
+    topVoted: "Most upvotes",
     newest: "Newest",
     loading: "Loading feedback…",
     emptyTitle: "No feedback yet",
@@ -61,6 +61,8 @@ const translations = {
     removeUpvoteFor: "Remove upvote from",
     downvoteFor: "Downvote",
     removeDownvoteFor: "Remove downvote from",
+    upvoteCountLabel: "upvotes",
+    downvoteCountLabel: "downvotes",
     deleteFeedback: "Delete",
     deleteFeedbackLabel: "Delete feedback",
     deleteConfirmation: "Delete this feedback? This cannot be undone.",
@@ -107,7 +109,7 @@ const translations = {
     pageSubtitle: "提出回饋並投票，決定接下來要處理什麼。",
     giveFeedback: "提出回饋",
     sortBy: "排序方式",
-    topVoted: "最高票",
+    topVoted: "最多贊成票",
     newest: "最新",
     loading: "正在載入回饋…",
     emptyTitle: "目前還沒有回饋",
@@ -129,6 +131,8 @@ const translations = {
     removeUpvoteFor: "取消贊成票：",
     downvoteFor: "投反對票給",
     removeDownvoteFor: "取消反對票：",
+    upvoteCountLabel: "個贊成票",
+    downvoteCountLabel: "個反對票",
     deleteFeedback: "刪除",
     deleteFeedbackLabel: "刪除回饋",
     deleteConfirmation: "確定要刪除這則回饋嗎？刪除後無法復原。",
@@ -175,7 +179,7 @@ const translations = {
     pageSubtitle: "フィードバックを共有して投票し、次に対応する項目を決めます。",
     giveFeedback: "フィードバック",
     sortBy: "並び順",
-    topVoted: "投票数順",
+    topVoted: "賛成票順",
     newest: "新着順",
     loading: "フィードバックを読み込み中…",
     emptyTitle: "フィードバックはまだありません",
@@ -197,6 +201,8 @@ const translations = {
     removeUpvoteFor: "賛成票を取り消す：",
     downvoteFor: "反対票：",
     removeDownvoteFor: "反対票を取り消す：",
+    upvoteCountLabel: "件の賛成票",
+    downvoteCountLabel: "件の反対票",
     deleteFeedback: "削除",
     deleteFeedbackLabel: "フィードバックを削除",
     deleteConfirmation: "このフィードバックを削除しますか？この操作は元に戻せません。",
@@ -367,9 +373,10 @@ function createLocalBackend() {
           ? localStorage.getItem(storageKeys.nickname) || item.authorNickname
           : item.authorNickname,
       createdAt: item.createdAt,
-      voteCount:
+      upvoteCount:
         (item.baseVotes || 0) +
-        Object.values(voteValues).reduce((total, value) => total + Number(value), 0),
+        Object.values(voteValues).filter((value) => Number(value) === 1).length,
+      downvoteCount: Object.values(voteValues).filter((value) => Number(value) === -1).length,
       userVote,
       isOwner: item.authorId === userId,
     };
@@ -584,7 +591,8 @@ function createSupabaseBackend() {
           description: item.description,
           authorNickname: item.author?.nickname || "Unknown",
           createdAt: item.created_at,
-          voteCount: item.votes.reduce((total, vote) => total + vote.value, 0),
+          upvoteCount: item.votes.filter((vote) => vote.value === 1).length,
+          downvoteCount: item.votes.filter((vote) => vote.value === -1).length,
           userVote,
           isOwner: item.author_id === userId,
         };
@@ -771,8 +779,11 @@ function sortedFeedback() {
   }
 
   return items.sort((a, b) => {
-    if (b.voteCount !== a.voteCount) {
-      return b.voteCount - a.voteCount;
+    if (b.upvoteCount !== a.upvoteCount) {
+      return b.upvoteCount - a.upvoteCount;
+    }
+    if (a.downvoteCount !== b.downvoteCount) {
+      return a.downvoteCount - b.downvoteCount;
     }
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
@@ -798,31 +809,43 @@ function renderFeedback() {
     const upvoteButton = document.createElement("button");
     upvoteButton.className = `vote-button is-upvote${item.userVote === 1 ? " is-selected" : ""}`;
     upvoteButton.type = "button";
-    upvoteButton.textContent = "↑";
     upvoteButton.setAttribute("aria-pressed", String(item.userVote === 1));
     upvoteButton.setAttribute(
       "aria-label",
-      `${t(item.userVote === 1 ? "removeUpvoteFor" : "upvoteFor")} ${item.description}`,
+      `${t(item.userVote === 1 ? "removeUpvoteFor" : "upvoteFor")} ${item.description}. ${item.upvoteCount} ${t("upvoteCountLabel")}`,
     );
 
-    const voteCount = document.createElement("span");
-    voteCount.className = "vote-count";
-    voteCount.textContent = item.voteCount.toLocaleString();
+    const upvoteSymbol = document.createElement("span");
+    upvoteSymbol.className = "vote-symbol";
+    upvoteSymbol.textContent = "↑";
+
+    const upvoteCount = document.createElement("span");
+    upvoteCount.className = "vote-count";
+    upvoteCount.textContent = item.upvoteCount.toLocaleString();
+    upvoteButton.append(upvoteSymbol, upvoteCount);
 
     const downvoteButton = document.createElement("button");
     downvoteButton.className = `vote-button is-downvote${item.userVote === -1 ? " is-selected" : ""}`;
     downvoteButton.type = "button";
-    downvoteButton.textContent = "↓";
     downvoteButton.setAttribute("aria-pressed", String(item.userVote === -1));
     downvoteButton.setAttribute(
       "aria-label",
-      `${t(item.userVote === -1 ? "removeDownvoteFor" : "downvoteFor")} ${item.description}`,
+      `${t(item.userVote === -1 ? "removeDownvoteFor" : "downvoteFor")} ${item.description}. ${item.downvoteCount} ${t("downvoteCountLabel")}`,
     );
+
+    const downvoteSymbol = document.createElement("span");
+    downvoteSymbol.className = "vote-symbol";
+    downvoteSymbol.textContent = "↓";
+
+    const downvoteCount = document.createElement("span");
+    downvoteCount.className = "vote-count";
+    downvoteCount.textContent = item.downvoteCount.toLocaleString();
+    downvoteButton.append(downvoteSymbol, downvoteCount);
 
     const voteButtons = [upvoteButton, downvoteButton];
     upvoteButton.addEventListener("click", () => handleVote(item, 1, voteButtons));
     downvoteButton.addEventListener("click", () => handleVote(item, -1, voteButtons));
-    voteControls.append(upvoteButton, voteCount, downvoteButton);
+    voteControls.append(upvoteButton, downvoteButton);
 
     const content = document.createElement("div");
     content.className = "feedback-content";
@@ -870,7 +893,16 @@ async function handleVote(item, selectedValue, buttons) {
 
   try {
     await state.backend.setVote(item.id, state.userId, nextValue);
-    item.voteCount += nextValue - item.userVote;
+    if (item.userVote === 1) {
+      item.upvoteCount -= 1;
+    } else if (item.userVote === -1) {
+      item.downvoteCount -= 1;
+    }
+    if (nextValue === 1) {
+      item.upvoteCount += 1;
+    } else if (nextValue === -1) {
+      item.downvoteCount += 1;
+    }
     item.userVote = nextValue;
     renderFeedback();
     const notificationKey =

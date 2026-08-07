@@ -1,6 +1,6 @@
 # Debug tool feedbacks
 
-A static feedback board designed for GitHub Pages with a shared-password gate, a separate administrator mode, editable nicknames, description-only submissions, owner deletion, and one upvote or downvote per browser identity. Supabase provides anonymous identity, server-side password verification, administrator authorization, and persistent feedback.
+A static feedback board designed for GitHub Pages with a shared-password gate, a separate administrator mode, editable nicknames, description-only submissions, owner deletion, and separate upvote/downvote totals. Each browser identity can choose an upvote, a downvote, or no vote for each item, but never both. Supabase provides anonymous identity, server-side password verification, administrator authorization, and persistent feedback.
 
 ## Preview locally
 
