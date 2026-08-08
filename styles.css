@@ -439,7 +439,7 @@ select:focus {
   transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
-.vote-button:hover:not(:disabled) {
+.vote-button:hover:not(:disabled):not(.is-selected) {
   border-color: var(--accent);
   background: rgba(255, 152, 29, 0.06);
   transform: translateY(-2px);
@@ -455,7 +455,7 @@ select:focus {
   color: var(--downvote);
 }
 
-.vote-button.is-downvote:hover:not(:disabled) {
+.vote-button.is-downvote:hover:not(:disabled):not(.is-selected) {
   border-color: var(--downvote);
   background: rgba(103, 169, 255, 0.07);
 }
@@ -464,6 +464,11 @@ select:focus {
   border-color: var(--downvote);
   background: var(--downvote);
   color: #07101d;
+}
+
+.vote-button.is-selected:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
 }
 
 .vote-count {
