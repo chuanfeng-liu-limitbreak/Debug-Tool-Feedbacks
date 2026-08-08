@@ -122,6 +122,31 @@
           </div>
         </div>
 
+        <div class="board-tabs" role="tablist" aria-label="Board type">
+          <button
+            id="feedback-tab"
+            class="board-tab is-active"
+            type="button"
+            role="tab"
+            aria-selected="true"
+            aria-controls="feedback-list"
+            data-board-type="feedback"
+          >
+            Feedback
+          </button>
+          <button
+            id="bug-report-tab"
+            class="board-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+            aria-controls="feedback-list"
+            data-board-type="bug_report"
+          >
+            Bug Report
+          </button>
+        </div>
+
         <div id="loading-state" class="loading-state" aria-live="polite">Loading feedback…</div>
 
         <div id="empty-state" class="empty-state" hidden>
@@ -131,7 +156,13 @@
           <button id="empty-feedback-button" class="primary-button" type="button">Give feedback</button>
         </div>
 
-        <div id="feedback-list" class="feedback-list" aria-live="polite"></div>
+        <div
+          id="feedback-list"
+          class="feedback-list"
+          role="tabpanel"
+          aria-labelledby="feedback-tab"
+          aria-live="polite"
+        ></div>
       </section>
     </main>
 

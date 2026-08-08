@@ -11,7 +11,7 @@ const translations = {
     adminActive: "Admin ✓",
     adminEyebrow: "ADMIN ACCESS",
     adminTitle: "Administrator mode",
-    adminDescription: "Enter the administrator password to manage all feedback.",
+    adminDescription: "Enter the administrator password to manage all items.",
     adminPasswordLabel: "Administrator password",
     adminPasswordPlaceholder: "Enter administrator password",
     adminRequired: "Enter the administrator password.",
@@ -19,9 +19,9 @@ const translations = {
     enableAdmin: "Enable admin mode",
     adminEnabled: "Administrator mode enabled.",
     adminAlreadyEnabled: "Administrator mode is already enabled.",
-    clearAllFeedback: "Clear all feedback",
-    clearAllConfirmation: "Delete every feedback item and vote? This cannot be undone.",
-    feedbackCleared: "All feedback has been cleared.",
+    clearAllFeedback: "Clear all items",
+    clearAllConfirmation: "Delete every feedback, bug report, and vote? This cannot be undone.",
+    feedbackCleared: "All items have been cleared.",
     nicknameEyebrow: "WELCOME",
     nicknameTitle: "Choose your nickname",
     nicknameDescription: "This name will appear next to the feedback you share.",
@@ -37,21 +37,33 @@ const translations = {
     boardEyebrow: "COMMUNITY REQUESTS",
     pageTitle: "Debug tool feedback",
     pageSubtitle: "Share feedback and vote on what we should work on next.",
+    feedbackTab: "Feedback",
+    bugReportTab: "Bug Report",
     giveFeedback: "Give feedback",
+    giveBugReport: "Report a bug",
     sortBy: "Sort by",
     topVoted: "Most upvotes",
     newest: "Newest",
     loading: "Loading feedback…",
     emptyTitle: "No feedback yet",
     emptyDescription: "Be the first to share an idea with the team.",
+    emptyBugTitle: "No bug reports yet",
+    emptyBugDescription: "Report an issue you found in the debug tool.",
     dialogEyebrow: "SHARE AN IDEA",
+    dialogBugEyebrow: "REPORT AN ISSUE",
     feedbackTitle: "Give feedback",
+    bugReportTitle: "Report a bug",
     descriptionLabel: "Feedback",
+    bugDescriptionLabel: "Bug description",
     descriptionPlaceholder: "Add details that will help the team understand your idea.",
+    bugDescriptionPlaceholder: "Describe what happened and how to reproduce it.",
     cancel: "Cancel",
     submit: "Submit feedback",
+    submitBugReport: "Submit bug report",
     feedbackError: "Add a description between 3 and 600 characters.",
+    bugReportError: "Add a bug description between 3 and 600 characters.",
     feedbackSaved: "Your feedback is live.",
+    bugReportSaved: "Your bug report is live.",
     upvoteAdded: "Upvote added.",
     downvoteAdded: "Downvote added.",
     voteRemoved: "Vote removed.",
@@ -81,7 +93,7 @@ const translations = {
     adminActive: "管理員 ✓",
     adminEyebrow: "管理員權限",
     adminTitle: "管理員模式",
-    adminDescription: "輸入管理員密碼以管理所有回饋。",
+    adminDescription: "輸入管理員密碼以管理所有項目。",
     adminPasswordLabel: "管理員密碼",
     adminPasswordPlaceholder: "輸入管理員密碼",
     adminRequired: "請輸入管理員密碼。",
@@ -89,9 +101,9 @@ const translations = {
     enableAdmin: "啟用管理員模式",
     adminEnabled: "管理員模式已啟用。",
     adminAlreadyEnabled: "管理員模式已經啟用。",
-    clearAllFeedback: "清除全部回饋",
-    clearAllConfirmation: "確定要刪除所有回饋與投票嗎？此操作無法復原。",
-    feedbackCleared: "所有回饋已清除。",
+    clearAllFeedback: "清除全部項目",
+    clearAllConfirmation: "確定要刪除所有回饋、錯誤回報與投票嗎？此操作無法復原。",
+    feedbackCleared: "所有項目已清除。",
     nicknameEyebrow: "歡迎",
     nicknameTitle: "選擇你的暱稱",
     nicknameDescription: "這個名稱會顯示在你提出的回饋旁。",
@@ -107,21 +119,33 @@ const translations = {
     boardEyebrow: "社群需求",
     pageTitle: "Debug Tool 回饋",
     pageSubtitle: "提出回饋並投票，決定接下來要處理什麼。",
+    feedbackTab: "回饋",
+    bugReportTab: "錯誤回報",
     giveFeedback: "提出回饋",
+    giveBugReport: "回報錯誤",
     sortBy: "排序方式",
     topVoted: "最多贊成票",
     newest: "最新",
     loading: "正在載入回饋…",
     emptyTitle: "目前還沒有回饋",
     emptyDescription: "成為第一個向團隊分享想法的人。",
+    emptyBugTitle: "目前還沒有錯誤回報",
+    emptyBugDescription: "回報你在 Debug Tool 發現的問題。",
     dialogEyebrow: "分享想法",
+    dialogBugEyebrow: "回報問題",
     feedbackTitle: "提出回饋",
+    bugReportTitle: "回報錯誤",
     descriptionLabel: "回饋內容",
+    bugDescriptionLabel: "錯誤描述",
     descriptionPlaceholder: "提供更多資訊，幫助團隊理解你的想法。",
+    bugDescriptionPlaceholder: "描述發生了什麼，以及如何重現問題。",
     cancel: "取消",
     submit: "送出回饋",
+    submitBugReport: "送出錯誤回報",
     feedbackError: "請輸入 3 到 600 個字元的回饋內容。",
+    bugReportError: "請輸入 3 到 600 個字元的錯誤描述。",
     feedbackSaved: "你的回饋已經發布。",
+    bugReportSaved: "錯誤回報已發布。",
     upvoteAdded: "已投贊成票。",
     downvoteAdded: "已投反對票。",
     voteRemoved: "已取消投票。",
@@ -151,7 +175,7 @@ const translations = {
     adminActive: "管理者 ✓",
     adminEyebrow: "管理者アクセス",
     adminTitle: "管理者モード",
-    adminDescription: "すべてのフィードバックを管理するには、管理者パスワードを入力してください。",
+    adminDescription: "すべての項目を管理するには、管理者パスワードを入力してください。",
     adminPasswordLabel: "管理者パスワード",
     adminPasswordPlaceholder: "管理者パスワードを入力",
     adminRequired: "管理者パスワードを入力してください。",
@@ -160,8 +184,8 @@ const translations = {
     adminEnabled: "管理者モードを有効にしました。",
     adminAlreadyEnabled: "管理者モードはすでに有効です。",
     clearAllFeedback: "すべて削除",
-    clearAllConfirmation: "すべてのフィードバックと投票を削除しますか？この操作は元に戻せません。",
-    feedbackCleared: "すべてのフィードバックを削除しました。",
+    clearAllConfirmation: "すべてのフィードバック、バグ報告、投票を削除しますか？この操作は元に戻せません。",
+    feedbackCleared: "すべての項目を削除しました。",
     nicknameEyebrow: "ようこそ",
     nicknameTitle: "ニックネームを選択",
     nicknameDescription: "投稿したフィードバックに、この名前が表示されます。",
@@ -177,21 +201,33 @@ const translations = {
     boardEyebrow: "コミュニティのリクエスト",
     pageTitle: "Debug Tool フィードバック",
     pageSubtitle: "フィードバックを共有して投票し、次に対応する項目を決めます。",
+    feedbackTab: "フィードバック",
+    bugReportTab: "バグ報告",
     giveFeedback: "フィードバック",
+    giveBugReport: "バグを報告",
     sortBy: "並び順",
     topVoted: "賛成票順",
     newest: "新着順",
     loading: "フィードバックを読み込み中…",
     emptyTitle: "フィードバックはまだありません",
     emptyDescription: "最初のアイデアをチームに共有しましょう。",
+    emptyBugTitle: "バグ報告はまだありません",
+    emptyBugDescription: "Debug Tool で見つけた問題を報告してください。",
     dialogEyebrow: "アイデアを共有",
+    dialogBugEyebrow: "問題を報告",
     feedbackTitle: "フィードバックを送る",
+    bugReportTitle: "バグを報告",
     descriptionLabel: "フィードバック",
+    bugDescriptionLabel: "バグの詳細",
     descriptionPlaceholder: "チームがアイデアを理解できるよう、詳細を追加してください。",
+    bugDescriptionPlaceholder: "発生した問題と再現方法を入力してください。",
     cancel: "キャンセル",
     submit: "送信する",
+    submitBugReport: "バグ報告を送信",
     feedbackError: "3〜600文字のフィードバックを入力してください。",
+    bugReportError: "3〜600文字でバグの詳細を入力してください。",
     feedbackSaved: "フィードバックを公開しました。",
+    bugReportSaved: "バグ報告を公開しました。",
     upvoteAdded: "賛成票を投じました。",
     downvoteAdded: "反対票を投じました。",
     voteRemoved: "投票を取り消しました。",
@@ -213,6 +249,7 @@ const translations = {
 
 const storageKeys = {
   language: "debug-feedback-language",
+  activeType: "debug-feedback-active-type",
   nickname: "debug-feedback-nickname",
   localUserId: "debug-feedback-local-user-id",
   localFeedback: "debug-feedback-local-items-v2",
@@ -236,6 +273,8 @@ const elements = {
   nicknameBadge: document.querySelector("#nickname-badge"),
   adminModeButton: document.querySelector("#admin-mode-button"),
   clearFeedbackButton: document.querySelector("#clear-feedback-button"),
+  feedbackTab: document.querySelector("#feedback-tab"),
+  bugReportTab: document.querySelector("#bug-report-tab"),
   newFeedbackButton: document.querySelector("#new-feedback-button"),
   emptyFeedbackButton: document.querySelector("#empty-feedback-button"),
   loadingState: document.querySelector("#loading-state"),
@@ -273,21 +312,13 @@ const textBindings = {
   "#board-eyebrow": "boardEyebrow",
   "#page-title": "pageTitle",
   "#page-subtitle": "pageSubtitle",
-  "#new-feedback-button": "giveFeedback",
   "#sort-label": "sortBy",
   "#sort-top-option": "topVoted",
   "#sort-new-option": "newest",
   "#loading-state": "loading",
-  "#empty-title": "emptyTitle",
-  "#empty-description": "emptyDescription",
-  "#empty-feedback-button": "giveFeedback",
-  "#dialog-eyebrow": "dialogEyebrow",
-  "#dialog-title": "feedbackTitle",
-  "#feedback-description-label": "descriptionLabel",
   "#cancel-nickname-button": "cancel",
   "#cancel-feedback-button": "cancel",
   "#cancel-admin-button": "cancel",
-  "#submit-feedback-button": "submit",
 };
 
 const state = {
@@ -295,6 +326,8 @@ const state = {
   nickname: "",
   userId: "",
   feedback: [],
+  activeType:
+    localStorage.getItem(storageKeys.activeType) === "bug_report" ? "bug_report" : "feedback",
   backend: null,
   isAdmin: false,
   editingNickname: false,
@@ -328,6 +361,7 @@ function createLocalBackend() {
             .map((item) => ({
               ...item,
               description: item.description?.trim() || item.title || "",
+              kind: "feedback",
             }));
           writeItems(migratedItems);
           return migratedItems;
@@ -367,6 +401,7 @@ function createLocalBackend() {
     const userVote = voteValues[userId] || 0;
     return {
       id: item.id,
+      kind: item.kind === "bug_report" ? "bug_report" : "feedback",
       description: item.description,
       authorNickname:
         item.authorId === userId
@@ -434,10 +469,11 @@ function createLocalBackend() {
       return readItems().map((item) => normalize(item, userId));
     },
 
-    async createFeedback({ description, nickname, userId }) {
+    async createFeedback({ description, kind, nickname, userId }) {
       const items = readItems();
       items.unshift({
         id: crypto.randomUUID(),
+        kind,
         description,
         authorNickname: nickname,
         authorId: userId,
@@ -578,7 +614,7 @@ function createSupabaseBackend() {
       const { data, error } = await client
         .from("feedback")
         .select(
-          "id,description,author_id,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id,value)",
+          "id,kind,description,author_id,created_at,author:profiles!feedback_author_id_fkey(nickname),votes(user_id,value)",
         );
       if (error) {
         throw error;
@@ -588,6 +624,7 @@ function createSupabaseBackend() {
         const userVote = item.votes.find((vote) => vote.user_id === userId)?.value || 0;
         return {
           id: item.id,
+          kind: item.kind,
           description: item.description,
           authorNickname: item.author?.nickname || "Unknown",
           createdAt: item.created_at,
@@ -599,8 +636,9 @@ function createSupabaseBackend() {
       });
     },
 
-    async createFeedback({ description, userId }) {
+    async createFeedback({ description, kind, userId }) {
       const { error } = await client.from("feedback").insert({
+        kind,
         description,
         author_id: userId,
       });
@@ -677,12 +715,12 @@ function applyLanguage(language) {
   elements.nicknameInput.placeholder = t("nicknamePlaceholder");
   elements.accessPasswordInput.placeholder = t("accessPlaceholder");
   elements.adminPasswordInput.placeholder = t("adminPasswordPlaceholder");
-  elements.feedbackDescriptionInput.placeholder = t("descriptionPlaceholder");
   elements.closeDialogButton.setAttribute("aria-label", t("close"));
   elements.closeAdminDialogButton.setAttribute("aria-label", t("close"));
   renderNicknameMode();
   updateNicknameBadge();
   updateAdminUi();
+  updateBoardTypeUi();
   renderFeedback();
 }
 
@@ -715,6 +753,68 @@ function updateAdminUi() {
   elements.adminModeButton.classList.toggle("is-active", state.isAdmin);
   elements.adminModeButton.setAttribute("aria-pressed", String(state.isAdmin));
   elements.clearFeedbackButton.hidden = !state.isAdmin;
+}
+
+function updateBoardTypeUi() {
+  const isBugReport = state.activeType === "bug_report";
+  elements.feedbackTab.textContent = t("feedbackTab");
+  elements.bugReportTab.textContent = t("bugReportTab");
+
+  [elements.feedbackTab, elements.bugReportTab].forEach((tab) => {
+    const isActive = tab.dataset.boardType === state.activeType;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-selected", String(isActive));
+    tab.tabIndex = isActive ? 0 : -1;
+  });
+
+  const actionKey = isBugReport ? "giveBugReport" : "giveFeedback";
+  elements.newFeedbackButton.textContent = t(actionKey);
+  elements.emptyFeedbackButton.textContent = t(actionKey);
+  document.querySelector("#empty-title").textContent = t(
+    isBugReport ? "emptyBugTitle" : "emptyTitle",
+  );
+  document.querySelector("#empty-description").textContent = t(
+    isBugReport ? "emptyBugDescription" : "emptyDescription",
+  );
+  document.querySelector("#dialog-eyebrow").textContent = t(
+    isBugReport ? "dialogBugEyebrow" : "dialogEyebrow",
+  );
+  document.querySelector("#dialog-title").textContent = t(
+    isBugReport ? "bugReportTitle" : "feedbackTitle",
+  );
+  document.querySelector("#feedback-description-label").textContent = t(
+    isBugReport ? "bugDescriptionLabel" : "descriptionLabel",
+  );
+  elements.feedbackDescriptionInput.placeholder = t(
+    isBugReport ? "bugDescriptionPlaceholder" : "descriptionPlaceholder",
+  );
+  elements.submitFeedbackButton.textContent = t(isBugReport ? "submitBugReport" : "submit");
+  elements.feedbackList.setAttribute(
+    "aria-labelledby",
+    isBugReport ? "bug-report-tab" : "feedback-tab",
+  );
+}
+
+function setActiveType(type) {
+  if (type !== "feedback" && type !== "bug_report") {
+    return;
+  }
+
+  state.activeType = type;
+  localStorage.setItem(storageKeys.activeType, type);
+  updateBoardTypeUi();
+  renderFeedback();
+}
+
+function handleBoardTabKeydown(event) {
+  if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+    return;
+  }
+
+  event.preventDefault();
+  const nextType = state.activeType === "feedback" ? "bug_report" : "feedback";
+  setActiveType(nextType);
+  (nextType === "feedback" ? elements.feedbackTab : elements.bugReportTab).focus();
 }
 
 function showAccessView() {
@@ -773,7 +873,7 @@ async function refreshFeedback() {
 }
 
 function sortedFeedback() {
-  const items = [...state.feedback];
+  const items = state.feedback.filter((item) => item.kind === state.activeType);
   if (elements.sortSelect.value === "new") {
     return items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
@@ -1103,7 +1203,9 @@ async function handleFeedbackSubmit(event) {
   event.preventDefault();
   const description = elements.feedbackDescriptionInput.value.trim();
   if (description.length < 3 || description.length > 600) {
-    elements.feedbackError.textContent = t("feedbackError");
+    elements.feedbackError.textContent = t(
+      state.activeType === "bug_report" ? "bugReportError" : "feedbackError",
+    );
     elements.feedbackDescriptionInput.focus();
     return;
   }
@@ -1114,12 +1216,13 @@ async function handleFeedbackSubmit(event) {
   try {
     await state.backend.createFeedback({
       description,
+      kind: state.activeType,
       nickname: state.nickname,
       userId: state.userId,
     });
     closeFeedbackDialog();
     await refreshFeedback();
-    showToast(t("feedbackSaved"));
+    showToast(t(state.activeType === "bug_report" ? "bugReportSaved" : "feedbackSaved"));
   } catch (error) {
     console.error(error);
     elements.feedbackError.textContent = t("genericError");
@@ -1137,6 +1240,10 @@ function bindEvents() {
   elements.nicknameBadge.addEventListener("click", () => showNicknameView(true));
   elements.adminModeButton.addEventListener("click", openAdminDialog);
   elements.clearFeedbackButton.addEventListener("click", handleClearAllFeedback);
+  elements.feedbackTab.addEventListener("click", () => setActiveType("feedback"));
+  elements.bugReportTab.addEventListener("click", () => setActiveType("bug_report"));
+  elements.feedbackTab.addEventListener("keydown", handleBoardTabKeydown);
+  elements.bugReportTab.addEventListener("keydown", handleBoardTabKeydown);
   elements.cancelNicknameButton.addEventListener("click", () => showFeedbackView());
   elements.feedbackForm.addEventListener("submit", handleFeedbackSubmit);
   elements.newFeedbackButton.addEventListener("click", openFeedbackDialog);
