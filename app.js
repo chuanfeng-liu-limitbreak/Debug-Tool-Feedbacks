@@ -2,7 +2,7 @@ const translations = {
   en: {
     accessEyebrow: "PRIVATE BOARD",
     accessTitle: "Enter password",
-    accessDescription: "Use the team password to continue.",
+    accessDescription: "Use the team or administrator password to continue.",
     accessPlaceholder: "Enter password",
     accessError: "Incorrect password. Please try again.",
     accessRequired: "Enter the password to continue.",
@@ -84,7 +84,7 @@ const translations = {
   zh: {
     accessEyebrow: "內部回饋",
     accessTitle: "輸入密碼",
-    accessDescription: "請輸入團隊共用密碼以繼續。",
+    accessDescription: "請輸入團隊共用密碼或管理員密碼以繼續。",
     accessPlaceholder: "輸入密碼",
     accessError: "密碼不正確，請再試一次。",
     accessRequired: "請輸入密碼以繼續。",
@@ -166,7 +166,7 @@ const translations = {
   ja: {
     accessEyebrow: "社内フィードバック",
     accessTitle: "パスワードを入力",
-    accessDescription: "チーム共通のパスワードを入力してください。",
+    accessDescription: "チーム共通または管理者パスワードを入力してください。",
     accessPlaceholder: "パスワードを入力",
     accessError: "パスワードが正しくありません。もう一度お試しください。",
     accessRequired: "続行するにはパスワードを入力してください。",

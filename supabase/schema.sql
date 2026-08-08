@@ -120,6 +120,7 @@ as $$
 declare
   current_user_id uuid := auth.uid();
   stored_hash text;
+  admin_hash text;
   failed_count integer := 0;
   current_lock timestamptz;
 begin
@@ -130,6 +131,11 @@ begin
   select password_hash
   into stored_hash
   from private.feedback_access_config
+  where id = true;
+
+  select password_hash
+  into admin_hash
+  from private.feedback_admin_config
   where id = true;
 
   if stored_hash is null then
@@ -143,6 +149,24 @@ begin
 
   if current_lock is not null and current_lock > now() then
     return false;
+  end if;
+
+  if admin_hash is not null and extensions.crypt(p_password, admin_hash) = admin_hash then
+    insert into public.feedback_access (user_id)
+    values (current_user_id)
+    on conflict (user_id) do nothing;
+
+    insert into public.feedback_admin_access (user_id)
+    values (current_user_id)
+    on conflict (user_id) do nothing;
+
+    delete from private.feedback_access_attempts
+    where user_id = current_user_id;
+
+    delete from private.feedback_admin_attempts
+    where user_id = current_user_id;
+
+    return true;
   end if;
 
   if extensions.crypt(p_password, stored_hash) = stored_hash then
